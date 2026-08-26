@@ -1,9 +1,8 @@
 {
   "version": 2,
   "installCommand": "cd frontend && npm install",
-  "buildCommand": "cd frontend && npm run build",
+  "buildCommand": "cd frontend && npx next build",
   "outputDirectory": "frontend/.next",
-  "framework": "nextjs",
   "functions": {
     "api/index.py": {
       "includeFiles": "backend/**"

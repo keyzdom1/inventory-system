@@ -19,3 +19,5 @@ node_modules/
 # OS / editor cruft
 .DS_Store
 Thumbs.db
+
+.vercel
