@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuth } from "@/components/Auth";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -14,6 +15,9 @@ const links = [
 
 export function Nav() {
   const pathname = usePathname();
+  const { user, logout } = useAuth();
+
+  if (pathname === "/login") return null;
 
   // Longest matching href wins so /products/low-stock doesn't also light up Products
   const activeHref =
@@ -48,6 +52,24 @@ export function Nav() {
             );
           })}
         </nav>
+        {user && (
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-slate-500">
+              {user.username}
+              {user.role === "admin" && (
+                <span className="ml-1 rounded-full bg-indigo-100 px-1.5 py-0.5 text-[10px] font-bold text-indigo-700">
+                  admin
+                </span>
+              )}
+            </span>
+            <button
+              onClick={logout}
+              className="rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-500 transition-colors duration-200 hover:bg-slate-100 hover:text-slate-700"
+            >
+              Logout
+            </button>
+          </div>
+        )}
       </div>
     </header>
   );

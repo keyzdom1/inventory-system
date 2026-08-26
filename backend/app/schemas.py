@@ -1,5 +1,6 @@
 from datetime import datetime
 from decimal import Decimal
+from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -18,8 +19,13 @@ class ProductCreate(ProductBase):
     pass
 
 
-class ProductUpdate(ProductBase):
-    pass
+class ProductUpdate(BaseModel):
+    name: Optional[str] = Field(default=None, min_length=1, max_length=200)
+    category: Optional[str] = Field(default=None, max_length=100)
+    cost_price: Optional[Decimal] = Field(default=None, ge=0)
+    selling_price: Optional[Decimal] = Field(default=None, ge=0)
+    quantity_in_stock: Optional[int] = Field(default=None, ge=0)
+    reorder_level: Optional[int] = Field(default=None, ge=0)
 
 
 class ProductOut(ProductBase):
@@ -41,8 +47,11 @@ class CustomerCreate(CustomerBase):
     pass
 
 
-class CustomerUpdate(CustomerBase):
-    pass
+class CustomerUpdate(BaseModel):
+    name: Optional[str] = Field(default=None, min_length=1, max_length=200)
+    phone: Optional[str] = Field(default=None, max_length=50)
+    email: Optional[str] = Field(default=None, max_length=200)
+    address: Optional[str] = None
 
 
 class CustomerOut(CustomerBase):
@@ -79,8 +88,11 @@ class SupplierCreate(SupplierBase):
     pass
 
 
-class SupplierUpdate(SupplierBase):
-    pass
+class SupplierUpdate(BaseModel):
+    name: Optional[str] = Field(default=None, min_length=1, max_length=200)
+    phone: Optional[str] = Field(default=None, max_length=50)
+    email: Optional[str] = Field(default=None, max_length=200)
+    address: Optional[str] = None
 
 
 class SupplierOut(SupplierBase):
@@ -141,6 +153,42 @@ class PurchaseOut(BaseModel):
     quantity: int
     unit_cost: Decimal
     purchase_date: datetime
+
+
+# ---------- Pagination ----------
+class PaginatedResponse(BaseModel):
+    items: list
+    total: int
+    page: int
+    limit: int
+    pages: int
+
+
+# ---------- Auth ----------
+class UserCreate(BaseModel):
+    username: str = Field(min_length=3, max_length=50)
+    email: str = Field(max_length=200)
+    password: str = Field(min_length=6)
+
+
+class UserLogin(BaseModel):
+    username: str
+    password: str
+
+
+class UserOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    username: str
+    email: str
+    role: str
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: UserOut
 
 
 # ---------- Dashboard ----------

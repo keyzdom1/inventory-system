@@ -26,16 +26,21 @@ export default function SuppliersPage() {
   const [pQty, setPQty] = useState(10);
   const [pCost, setPCost] = useState<string>("");
   const [flashPurchase, setFlashPurchase] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
 
-  const refresh = useCallback(async () => {
+  const refresh = useCallback(async (p = page) => {
     try {
-      const [ss, ps, purchasesList] = await Promise.all([
-        api.suppliers.list(),
-        api.products.list(),
+      const [supplierRes, productRes, purchasesList] = await Promise.all([
+        api.suppliers.list(p),
+        api.products.list(undefined, 1, 100),
         api.purchases.list(15),
       ]);
-      setSuppliers(ss);
-      setProducts(ps);
+      setSuppliers(supplierRes.items);
+      setTotalPages(supplierRes.pages);
+      setTotal(supplierRes.total);
+      setProducts(productRes.items);
       setPurchases(purchasesList);
     } catch (e) {
       toast("error", e instanceof Error ? e.message : "Failed to load suppliers");
@@ -44,8 +49,8 @@ export default function SuppliersPage() {
   }, []);
 
   useEffect(() => {
-    refresh();
-  }, [refresh]);
+    refresh(page);
+  }, [refresh, page]);
 
   async function save() {
     if (!form.name.trim()) return toast("error", "Supplier name is required");
@@ -105,7 +110,7 @@ export default function SuppliersPage() {
   async function savePurchase() {
     if (pSupplier === "") return toast("error", "Choose a supplier");
     if (pProduct === "") return toast("error", "Choose a product to restock");
-    if (!Number.isInteger(pQty) || pQty < 1) return toast("error", "Quantity must be a whole number ≥ 1");
+    if (!Number.isInteger(pQty) || pQty < 1) return toast("error", "Quantity must be a whole number >= 1");
     try {
       await api.purchases.create({
         supplier_id: pSupplier,
@@ -192,6 +197,45 @@ export default function SuppliersPage() {
           ))
         )}
       </section>
+
+      {totalPages > 1 && (
+        <div className="mb-4 flex items-center justify-between">
+          <p className="text-xs text-slate-400">
+            Showing {((page - 1) * 20) + 1}–{Math.min(page * 20, total)} of {total} suppliers
+          </p>
+          <div className="flex gap-1">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-600 transition-colors duration-200 hover:bg-slate-100 disabled:opacity-40"
+            >
+              Previous
+            </button>
+            {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+              const p = page <= 3 ? i + 1 : page + i - 2;
+              if (p < 1 || p > totalPages) return null;
+              return (
+                <button
+                  key={p}
+                  onClick={() => setPage(p)}
+                  className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors duration-200 ${
+                    p === page ? "bg-indigo-600 text-white" : "text-slate-600 hover:bg-slate-100"
+                  }`}
+                >
+                  {p}
+                </button>
+              );
+            })}
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              className="rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-600 transition-colors duration-200 hover:bg-slate-100 disabled:opacity-40"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
 
       <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div className="border-b border-slate-100 px-5 py-4">
@@ -325,7 +369,7 @@ export default function SuppliersPage() {
           </div>
           {selectedProduct && (
             <p className="rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-500">
-              Stock will go from <strong>{selectedProduct.quantity_in_stock}</strong> →{" "}
+              Stock will go from <strong>{selectedProduct.quantity_in_stock}</strong> to{" "}
               <strong>{selectedProduct.quantity_in_stock + pQty}</strong> after saving.
             </p>
           )}
@@ -333,7 +377,7 @@ export default function SuppliersPage() {
             <button onClick={() => setShowPurchase(false)} className="rounded-lg px-4 py-2 text-sm font-semibold text-slate-500 transition-colors duration-200 hover:bg-slate-100">
               Cancel
             </button>
-            <button onClick={savePurchase} className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:scale-[1.02] hover:bg-emerald-700">
+            <button onClick={savePurchase} className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:scale-[1.02] hover:bg-emerald-700">
               Save Purchase
             </button>
           </div>

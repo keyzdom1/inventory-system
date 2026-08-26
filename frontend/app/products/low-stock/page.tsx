@@ -30,7 +30,7 @@ export default function LowStockPage() {
 
   useEffect(() => {
     reload();
-    api.suppliers.list().then(setSuppliers).catch(() => {});
+    api.suppliers.list(1, 100).then((res) => setSuppliers(res.items)).catch(() => {});
   }, [reload]);
 
   function flash(id: number) {

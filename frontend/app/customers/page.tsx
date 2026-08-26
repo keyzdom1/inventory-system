@@ -20,10 +20,16 @@ export default function CustomersPage() {
   const [saving, setSaving] = useState(false);
   const [expanded, setExpanded] = useState<number | null>(null);
   const [history, setHistory] = useState<Record<number, CustomerHistory | "loading" | "error">>({});
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
 
-  const reload = useCallback(async () => {
+  const reload = useCallback(async (p = page) => {
     try {
-      setCustomers(await api.customers.list());
+      const res = await api.customers.list(p);
+      setCustomers(res.items);
+      setTotalPages(res.pages);
+      setTotal(res.total);
     } catch (e) {
       toast("error", e instanceof Error ? e.message : "Failed to load customers");
     }
@@ -31,8 +37,8 @@ export default function CustomersPage() {
   }, []);
 
   useEffect(() => {
-    reload();
-  }, [reload]);
+    reload(page);
+  }, [reload, page]);
 
   async function toggleHistory(id: number) {
     if (expanded === id) {
@@ -163,11 +169,11 @@ export default function CustomersPage() {
                       className="overflow-hidden bg-slate-50/60"
                     >
                       <div className="px-5 pt-1 pb-4">
-                        {c.address && <p className="mb-3 text-xs text-slate-400">📍 {c.address}</p>}
+                        {c.address && <p className="mb-3 text-xs text-slate-400">{c.address}</p>}
                         {!h || h === "loading" ? (
                           <div className="h-16 animate-pulse rounded-lg bg-slate-100" />
                         ) : h === "error" ? (
-                          <p className="text-sm text-red-600">Couldn't load purchase history.</p>
+                          <p className="text-sm text-red-600">Couldn&apos;t load purchase history.</p>
                         ) : h.sales.length === 0 ? (
                           <p className="py-2 text-sm text-slate-400">No purchases yet.</p>
                         ) : (
@@ -213,6 +219,45 @@ export default function CustomersPage() {
           </ul>
         )}
       </div>
+
+      {totalPages > 1 && (
+        <div className="mt-4 flex items-center justify-between">
+          <p className="text-xs text-slate-400">
+            Showing {((page - 1) * 20) + 1}–{Math.min(page * 20, total)} of {total} customers
+          </p>
+          <div className="flex gap-1">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-600 transition-colors duration-200 hover:bg-slate-100 disabled:opacity-40"
+            >
+              Previous
+            </button>
+            {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+              const p = page <= 3 ? i + 1 : page + i - 2;
+              if (p < 1 || p > totalPages) return null;
+              return (
+                <button
+                  key={p}
+                  onClick={() => setPage(p)}
+                  className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors duration-200 ${
+                    p === page ? "bg-indigo-600 text-white" : "text-slate-600 hover:bg-slate-100"
+                  }`}
+                >
+                  {p}
+                </button>
+              );
+            })}
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              className="rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-600 transition-colors duration-200 hover:bg-slate-100 disabled:opacity-40"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
 
       <Modal
         open={showForm}

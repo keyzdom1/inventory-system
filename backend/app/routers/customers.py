@@ -1,6 +1,7 @@
+import math
 from decimal import Decimal
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -11,9 +12,25 @@ from ..database import get_db
 router = APIRouter(prefix="/api/customers", tags=["customers"])
 
 
-@router.get("", response_model=list[schemas.CustomerOut])
-def list_customers(db: Session = Depends(get_db)):
-    return db.scalars(select(models.Customer).order_by(models.Customer.name)).all()
+@router.get("")
+def list_customers(
+    page: int = Query(default=1, ge=1),
+    limit: int = Query(default=20, ge=1, le=100),
+    db: Session = Depends(get_db),
+):
+    total = db.scalar(select(func.count()).select_from(models.Customer)) or 0
+    pages = math.ceil(total / limit) if total > 0 else 1
+    offset = (page - 1) * limit
+    items = db.scalars(
+        select(models.Customer).order_by(models.Customer.name).offset(offset).limit(limit)
+    ).all()
+    return {
+        "items": items,
+        "total": total,
+        "page": page,
+        "limit": limit,
+        "pages": pages,
+    }
 
 
 @router.post("", response_model=schemas.CustomerOut, status_code=201)
@@ -30,7 +47,7 @@ def update_customer(customer_id: int, payload: schemas.CustomerUpdate, db: Sessi
     customer = db.get(models.Customer, customer_id)
     if customer is None:
         raise HTTPException(status_code=404, detail="Customer not found")
-    for key, value in payload.model_dump().items():
+    for key, value in payload.model_dump(exclude_unset=True).items():
         setattr(customer, key, value)
     db.commit()
     db.refresh(customer)

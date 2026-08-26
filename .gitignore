@@ -1,13 +1,20 @@
 # secrets / environment
 .env
+.env.local
 
 # python
 __pycache__/
 *.py[cod]
 .venv/
+test.db
+.pytest_cache/
 
 # logs
 *.log
+
+# node
+node_modules/
+.next/
 
 # OS / editor cruft
 .DS_Store

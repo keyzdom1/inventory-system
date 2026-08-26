@@ -1,5 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
+import math
+
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -9,9 +11,25 @@ from ..database import get_db
 router = APIRouter(prefix="/api/suppliers", tags=["suppliers"])
 
 
-@router.get("", response_model=list[schemas.SupplierOut])
-def list_suppliers(db: Session = Depends(get_db)):
-    return db.scalars(select(models.Supplier).order_by(models.Supplier.name)).all()
+@router.get("")
+def list_suppliers(
+    page: int = Query(default=1, ge=1),
+    limit: int = Query(default=20, ge=1, le=100),
+    db: Session = Depends(get_db),
+):
+    total = db.scalar(select(func.count()).select_from(models.Supplier)) or 0
+    pages = math.ceil(total / limit) if total > 0 else 1
+    offset = (page - 1) * limit
+    items = db.scalars(
+        select(models.Supplier).order_by(models.Supplier.name).offset(offset).limit(limit)
+    ).all()
+    return {
+        "items": items,
+        "total": total,
+        "page": page,
+        "limit": limit,
+        "pages": pages,
+    }
 
 
 @router.post("", response_model=schemas.SupplierOut, status_code=201)
@@ -28,7 +46,7 @@ def update_supplier(supplier_id: int, payload: schemas.SupplierUpdate, db: Sessi
     supplier = db.get(models.Supplier, supplier_id)
     if supplier is None:
         raise HTTPException(status_code=404, detail="Supplier not found")
-    for key, value in payload.model_dump().items():
+    for key, value in payload.model_dump(exclude_unset=True).items():
         setattr(supplier, key, value)
     db.commit()
     db.refresh(supplier)
