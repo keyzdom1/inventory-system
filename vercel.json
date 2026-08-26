@@ -1,14 +1,12 @@
 {
   "version": 2,
   "functions": {
-    "server/index.py": {
-      "includeFiles": "server/**"
-    }
+    "api/server.py": {}
   },
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "/server/index.py"
+      "destination": "/api/server.py"
     }
   ]
 }
