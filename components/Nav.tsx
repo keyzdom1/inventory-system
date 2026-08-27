@@ -14,6 +14,7 @@ const links = [
   { href: "/sales", label: "Sales" },
   { href: "/customers", label: "Customers" },
   { href: "/suppliers", label: "Suppliers" },
+  { href: "/admin", label: "Admin", adminOnly: true },
 ];
 
 export function Nav() {
@@ -68,22 +69,24 @@ export function Nav() {
             </div>
 
             <nav className="flex-1 overflow-y-auto px-3 py-3">
-              {links.map((l) => {
-                const active = activeHref === l.href;
-                return (
-                  <Link
-                    key={l.href}
-                    href={l.href}
-                    className={`mb-1 block rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-                      active
-                        ? "bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300"
-                        : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
-                    }`}
-                  >
-                    {l.label}
-                  </Link>
-                );
-              })}
+              {links
+                .filter((l) => !l.adminOnly || user?.role === "admin")
+                .map((l) => {
+                  const active = activeHref === l.href;
+                  return (
+                    <Link
+                      key={l.href}
+                      href={l.href}
+                      className={`mb-1 block rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                        active
+                          ? "bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300"
+                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+                      }`}
+                    >
+                      {l.label}
+                    </Link>
+                  );
+                })}
             </nav>
 
             <div className="border-t border-slate-200 px-5 py-4 dark:border-slate-700">
@@ -147,22 +150,24 @@ export function Nav() {
           </Link>
 
           <nav className="hidden items-center gap-1 md:flex">
-            {links.map((l) => {
-              const active = activeHref === l.href;
-              return (
-                <Link
-                  key={l.href}
-                  href={l.href}
-                  className={`rounded-lg px-3 py-1.5 text-sm font-medium whitespace-nowrap transition-colors ${
-                    active
-                      ? "bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300"
-                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
-                  }`}
-                >
-                  {l.label}
-                </Link>
-              );
-            })}
+            {links
+              .filter((l) => !l.adminOnly || user?.role === "admin")
+              .map((l) => {
+                const active = activeHref === l.href;
+                return (
+                  <Link
+                    key={l.href}
+                    href={l.href}
+                    className={`rounded-lg px-3 py-1.5 text-sm font-medium whitespace-nowrap transition-colors ${
+                      active
+                        ? "bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300"
+                        : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+                    }`}
+                  >
+                    {l.label}
+                  </Link>
+                );
+              })}
           </nav>
 
           {user && (

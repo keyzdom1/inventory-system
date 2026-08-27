@@ -106,10 +106,16 @@ export interface User {
   username: string;
   email: string;
   role: string;
+  is_approved: boolean;
 }
 
 export interface Token {
   access_token: string;
   token_type: string;
+  user: User;
+}
+
+export interface RegisterResponse {
+  message: string;
   user: User;
 }

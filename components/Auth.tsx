@@ -49,12 +49,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [router]);
 
   const register = useCallback(async (username: string, email: string, password: string) => {
-    const token = await api.auth.register(username, email, password);
-    setToken(token.access_token);
-    setStoredUser(token.user);
-    setUser(token.user);
-    router.push("/");
-  }, [router]);
+    const { api } = await import("@/lib/api");
+    await api.auth.register(username, email, password);
+  }, []);
 
   const logout = useCallback(() => {
     setToken(null);

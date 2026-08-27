@@ -183,11 +183,17 @@ class UserOut(BaseModel):
     username: str
     email: str
     role: str
+    is_approved: bool
 
 
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
+    user: UserOut
+
+
+class RegisterResponse(BaseModel):
+    message: str
     user: UserOut
 
 

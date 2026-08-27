@@ -15,6 +15,7 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(200), unique=True, nullable=False)
     hashed_password: Mapped[str] = mapped_column(String(200), nullable=False)
     role: Mapped[str] = mapped_column(String(20), nullable=False, default="user")
+    is_approved: Mapped[bool] = mapped_column(nullable=False, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 

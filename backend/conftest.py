@@ -8,6 +8,8 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import sessionmaker
 
+from app import models
+from app.auth import hash_password
 from app.database import Base, get_db
 from app.main import app
 
@@ -56,12 +58,43 @@ def client(db):
 
 @pytest.fixture
 def auth_headers(client):
-    res = client.post("/api/auth/register", json={
-        "username": "testuser",
-        "email": "test@example.com",
-        "password": "password123",
-    })
-    token = res.json()["access_token"]
+    from app.auth import create_access_token
+
+    user = models.User(
+        username="testuser",
+        email="test@example.com",
+        hashed_password=hash_password("password123"),
+        role="user",
+        is_approved=True,
+    )
+    db = TestingSessionLocal()
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    db.close()
+
+    token = create_access_token({"sub": str(user.id)})
+    return {"Authorization": f"Bearer {token}"}
+
+
+@pytest.fixture
+def admin_headers(client):
+    from app.auth import create_access_token
+
+    user = models.User(
+        username="adminuser",
+        email="admin@example.com",
+        hashed_password=hash_password("password123"),
+        role="admin",
+        is_approved=True,
+    )
+    db = TestingSessionLocal()
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    db.close()
+
+    token = create_access_token({"sub": str(user.id)})
     return {"Authorization": f"Bearer {token}"}
 
 
