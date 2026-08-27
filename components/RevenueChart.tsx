@@ -15,7 +15,7 @@ export default function RevenueChart({ chartData }: { chartData: ReturnType<type
     <Bar
       data={{
         ...chartData,
-        datasets: chartData.datasets.map((ds) => ({
+        datasets: chartData.datasets.map((ds: { label: string; data: number[]; backgroundColor: string; borderRadius: number; maxBarThickness: number }) => ({
           ...ds,
           backgroundColor: isDark ? "#818cf8" : "#6366f1",
         })),
