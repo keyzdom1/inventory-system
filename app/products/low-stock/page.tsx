@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "motion/react";
 import { PageHeader } from "@/components/StatCard";
 import { useToast } from "@/components/Toast";
 import { EmptyState, Modal, TableSkeleton } from "@/components/ui";
@@ -98,11 +97,9 @@ export default function LowStockPage() {
                 {products.map((p) => {
                   const short = shortfall(p);
                   return (
-                    <motion.tr
+                    <tr
                       key={p.id}
-                      animate={flashId === p.id ? { backgroundColor: ["#d1fae5", "#ffffff"] } : { backgroundColor: "#ffffff" }}
-                      transition={{ duration: 1 }}
-                      className="border-b border-slate-50 last:border-0 dark:border-slate-700"
+                      className={`border-b border-slate-50 last:border-0 dark:border-slate-700 ${flashId === p.id ? "bg-emerald-50 dark:bg-emerald-900/20" : ""}`}
                     >
                       <td className="px-5 py-3">
                         <p className="font-medium text-slate-800 dark:text-slate-200">{p.name}</p>
@@ -130,7 +127,7 @@ export default function LowStockPage() {
                           Restock
                         </button>
                       </td>
-                    </motion.tr>
+                    </tr>
                   );
                 })}
               </tbody>

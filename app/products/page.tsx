@@ -7,7 +7,6 @@ import { api, type ProductInput } from "@/lib/api";
 import { naira, toNumber } from "@/lib/format";
 import type { Product, Supplier } from "@/lib/types";
 import { useEffect, useState } from "react";
-import { motion } from "motion/react";
 
 const emptyForm: ProductInput = {
   name: "",
@@ -185,11 +184,9 @@ export default function ProductsPage() {
                 {products.map((p) => {
                   const low = p.quantity_in_stock <= p.reorder_level;
                   return (
-                    <motion.tr
+                    <tr
                       key={p.id}
-                      animate={flashId === p.id ? { backgroundColor: ["#fef3c7", "#ffffff"] } : { backgroundColor: "#ffffff" }}
-                      transition={{ duration: 1 }}
-                      className="border-b border-slate-50 last:border-0 dark:border-slate-700"
+                      className={`border-b border-slate-50 last:border-0 dark:border-slate-700 ${flashId === p.id ? "bg-amber-50 dark:bg-amber-900/20" : ""}`}
                     >
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-2">
@@ -230,7 +227,7 @@ export default function ProductsPage() {
                           </button>
                         </div>
                       </td>
-                    </motion.tr>
+                    </tr>
                   );
                 })}
               </tbody>
