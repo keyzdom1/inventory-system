@@ -6,9 +6,10 @@ import { api } from "@/lib/api";
 import { naira, nairaCompact, num, toNumber } from "@/lib/format";
 import type { DashboardSummary, MonthlyProductSales } from "@/lib/types";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
-import { Bar } from "react-chartjs-2";
-import { Chart as ChartJS } from "chart.js/auto";
+
+const Bar = dynamic(() => import("react-chartjs-2").then((m) => m.Bar), { ssr: false });
 
 export default function DashboardPage() {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);

