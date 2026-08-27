@@ -83,12 +83,20 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     throw new ApiError(0, null, "Cannot reach the server. Is the backend running?");
   }
   if (res.status === 401) {
-    setToken(null);
-    setStoredUser(null);
-    if (typeof window !== "undefined" && !window.location.pathname.startsWith("/login")) {
-      window.location.href = "/login";
+    let body: unknown = null;
+    try {
+      body = await res.json();
+    } catch {
+      body = null;
     }
-    throw new ApiError(401, null, "Session expired. Please log in again.");
+    const message = extractMessage("Invalid username or password", body);
+    if (typeof window !== "undefined" && !window.location.pathname.startsWith("/login")) {
+      setToken(null);
+      setStoredUser(null);
+      window.location.href = "/login";
+      throw new ApiError(401, null, "Session expired. Please log in again.");
+    }
+    throw new ApiError(401, body, message);
   }
   if (!res.ok) {
     let body: unknown = null;
