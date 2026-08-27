@@ -63,21 +63,21 @@ export default function LowStockPage() {
   }
 
   const inputCls =
-    "w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none transition-colors duration-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100";
-  const labelCls = "mb-1 block text-xs font-semibold text-slate-600";
+    "w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none transition-colors duration-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:focus:ring-indigo-800";
+  const labelCls = "mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-400";
 
   return (
     <div>
       <PageHeader title="Low Stock Alerts" subtitle="Products at or below their reorder level">
         <Link
           href="/products"
-          className="rounded-lg bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-600 transition-all duration-200 hover:scale-[1.02] hover:bg-slate-200"
+          className="rounded-lg bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-600 transition-all duration-200 hover:scale-[1.02] hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-400"
         >
           All products →
         </Link>
       </PageHeader>
 
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800">
         {!products ? (
           <TableSkeleton rows={5} cols={5} />
         ) : products.length === 0 ? (
@@ -86,7 +86,7 @@ export default function LowStockPage() {
           <div className="overflow-x-auto">
             <table className="w-full min-w-[680px] text-sm">
               <thead>
-                <tr className="border-b border-slate-100 text-left text-xs tracking-wide text-slate-400 uppercase">
+                <tr className="border-b border-slate-100 text-left text-xs tracking-wide text-slate-400 uppercase dark:border-slate-700 dark:text-slate-500">
                   <th className="px-5 py-3 font-semibold">Product</th>
                   <th className="px-3 py-3 text-right font-semibold">In Stock</th>
                   <th className="px-3 py-3 text-right font-semibold">Reorder At</th>
@@ -102,18 +102,18 @@ export default function LowStockPage() {
                       key={p.id}
                       animate={flashId === p.id ? { backgroundColor: ["#d1fae5", "#ffffff"] } : { backgroundColor: "#ffffff" }}
                       transition={{ duration: 1 }}
-                      className="border-b border-slate-50 last:border-0"
+                      className="border-b border-slate-50 last:border-0 dark:border-slate-700"
                     >
                       <td className="px-5 py-3">
-                        <p className="font-medium text-slate-800">{p.name}</p>
-                        <span className="text-xs text-slate-400">{p.category}</span>
+                        <p className="font-medium text-slate-800 dark:text-slate-200">{p.name}</p>
+                        <span className="text-xs text-slate-400 dark:text-slate-500">{p.category}</span>
                       </td>
-                      <td className="px-3 py-3 text-right font-bold tabular-nums text-amber-600">{p.quantity_in_stock}</td>
-                      <td className="px-3 py-3 text-right tabular-nums text-slate-400">{p.reorder_level}</td>
+                      <td className="px-3 py-3 text-right font-bold tabular-nums text-amber-600 dark:text-amber-400">{p.quantity_in_stock}</td>
+                      <td className="px-3 py-3 text-right tabular-nums text-slate-400 dark:text-slate-500">{p.reorder_level}</td>
                       <td className="px-3 py-3 text-right tabular-nums">
                         <span
                           className={`rounded-full px-2 py-0.5 text-xs font-bold ${
-                            short > 0 ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"
+                            short > 0 ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
                           }`}
                         >
                           {short > 0 ? `+${short}` : "at limit"}
@@ -140,7 +140,7 @@ export default function LowStockPage() {
       </div>
 
       {products !== null && products.length > 0 && (
-        <p className="mt-3 text-xs text-slate-400">
+        <p className="mt-3 text-xs text-slate-400 dark:text-slate-500">
           {products.length} product{products.length === 1 ? "" : "s"} need{products.length === 1 ? "s" : ""} attention · restocking records a purchase and increases stock automatically.
         </p>
       )}
@@ -150,7 +150,7 @@ export default function LowStockPage() {
           <div>
             <label className={labelCls}>Supplier</label>
             {suppliers.length === 0 ? (
-              <p className="text-sm text-red-600">No suppliers yet — add one on the Suppliers page first.</p>
+              <p className="text-sm text-red-600 dark:text-red-400">No suppliers yet — add one on the Suppliers page first.</p>
             ) : (
               <select className={inputCls} value={restockSupplier} onChange={(e) => setRestockSupplier(e.target.value === "" ? "" : Number(e.target.value))}>
                 <option value="">Choose supplier…</option>
@@ -164,7 +164,7 @@ export default function LowStockPage() {
             <label className={labelCls}>Quantity received</label>
             <input type="number" min={1} className={inputCls} value={restockQty} onChange={(e) => setRestockQty(Number(e.target.value))} />
             {restocking && (
-              <p className="mt-1.5 text-xs text-slate-400">
+              <p className="mt-1.5 text-xs text-slate-400 dark:text-slate-500">
                 Current stock: {restocking.quantity_in_stock} → will become{" "}
                 {Math.max(0, restocking.quantity_in_stock + (Number.isFinite(restockQty) ? restockQty : 0))}
                 {shortfall(restocking) > 0 && <> · shortfall is {shortfall(restocking)}</>}
@@ -172,7 +172,7 @@ export default function LowStockPage() {
             )}
           </div>
           <div className="flex justify-end gap-2 pt-2">
-            <button onClick={() => setRestocking(null)} className="rounded-lg px-4 py-2 text-sm font-semibold text-slate-500 transition-colors duration-200 hover:bg-slate-100">
+            <button onClick={() => setRestocking(null)} className="rounded-lg px-4 py-2 text-sm font-semibold text-slate-500 transition-colors duration-200 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-700">
               Cancel
             </button>
             <button

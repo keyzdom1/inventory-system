@@ -94,16 +94,16 @@ export default function SalesPage() {
   }
 
   const inputCls =
-    "w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none transition-colors duration-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100";
+    "w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none transition-colors duration-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:focus:ring-indigo-800";
 
   return (
     <div>
       <PageHeader title="Record a Sale" subtitle="Stock is checked and deducted atomically on save" />
 
       <div className="grid gap-6 lg:grid-cols-5">
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:col-span-3">
+        <section className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-sm lg:col-span-3">
           <div className="mb-4">
-            <label className="mb-1 block text-xs font-semibold text-slate-600">Customer</label>
+            <label className="mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-400">Customer</label>
             <select className={inputCls} value={customerId} onChange={(e) => setCustomerId(e.target.value === "" ? "" : Number(e.target.value))}>
               <option value="">Walk-in customer</option>
               {customers.map((c) => (
@@ -129,10 +129,10 @@ export default function SalesPage() {
                       return next;
                     })
                   }
-                  className={`rounded-xl border p-3 ${err ? "border-red-300 bg-red-50/50" : "border-slate-200"}`}
+                  className={`rounded-xl border p-3 ${err ? "border-red-300 bg-red-50/50 dark:bg-red-900/20" : "border-slate-200 dark:border-slate-700"}`}
                 >
                   <div className="flex flex-wrap items-center gap-2 sm:flex-nowrap">
-                    <span className="hidden h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-500 sm:flex">
+                    <span className="hidden h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-700 text-xs font-bold text-slate-500 dark:text-slate-400 sm:flex">
                       {i + 1}
                     </span>
                     <select
@@ -154,18 +154,18 @@ export default function SalesPage() {
                       value={l.quantity}
                       onChange={(e) => updateLine(l.key, { quantity: Math.max(1, Math.floor(Number(e.target.value) || 1)) })}
                     />
-                    <span className="w-24 shrink-0 text-right text-sm font-semibold tabular-nums text-slate-700">{naira(lineTotal)}</span>
+                    <span className="w-24 shrink-0 text-right text-sm font-semibold tabular-nums text-slate-700 dark:text-slate-300">{naira(lineTotal)}</span>
                     {lines.length > 1 && (
                       <button
                         onClick={() => setLines((ls) => ls.filter((x) => x.key !== l.key))}
-                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-50 text-red-500 transition-all duration-200 hover:scale-[1.02] hover:bg-red-100"
+                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-50 dark:bg-red-900/30 text-red-500 dark:text-red-400 transition-all duration-200 hover:scale-[1.02] hover:bg-red-100 dark:hover:bg-red-900/50"
                         aria-label="Remove line"
                       >
                         ✕
                       </button>
                     )}
                   </div>
-                  {err && <p className="mt-2 pl-1 text-xs font-semibold text-red-600">{err}</p>}
+                  {err && <p className="mt-2 pl-1 text-xs font-semibold text-red-600 dark:text-red-400">{err}</p>}
                 </motion.div>
               );
             })}
@@ -173,13 +173,13 @@ export default function SalesPage() {
 
           <button
             onClick={() => setLines((ls) => [...ls, { key: lineKey++, product_id: "", quantity: 1 }])}
-            className="mt-3 rounded-lg bg-indigo-50 px-3 py-2 text-sm font-semibold text-indigo-600 transition-all duration-200 hover:scale-[1.02] hover:bg-indigo-100"
+            className="mt-3 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 px-3 py-2 text-sm font-semibold text-indigo-600 dark:text-indigo-400 transition-all duration-200 hover:scale-[1.02] hover:bg-indigo-100 dark:hover:bg-indigo-900/50"
           >
             + Add another product
           </button>
 
-          <div className="mt-5 flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3">
-            <span className="text-sm font-semibold text-slate-500">Total</span>
+          <div className="mt-5 flex items-center justify-between rounded-xl bg-slate-50 dark:bg-slate-700/50 px-4 py-3">
+            <span className="text-sm font-semibold text-slate-500 dark:text-slate-400">Total</span>
             <motion.span key={grandTotal} initial={{ scale: 0.97 }} animate={{ scale: 1 }} className="text-xl font-black tabular-nums text-slate-900">
               {naira(grandTotal)}
             </motion.span>
@@ -194,9 +194,9 @@ export default function SalesPage() {
           </button>
         </section>
 
-        <section className="rounded-2xl border border-slate-200 bg-white shadow-sm lg:col-span-2">
-          <div className="border-b border-slate-100 px-5 py-4">
-            <h2 className="text-sm font-bold tracking-wide text-slate-500 uppercase">Recent Sales</h2>
+        <section className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm lg:col-span-2">
+          <div className="border-b border-slate-100 dark:border-slate-700 px-5 py-4">
+            <h2 className="text-sm font-bold tracking-wide text-slate-500 dark:text-slate-400 uppercase">Recent Sales</h2>
           </div>
           {!recent ? (
             <TableSkeleton rows={6} cols={2} />
@@ -207,15 +207,15 @@ export default function SalesPage() {
               {recent.map((s) => (
                 <li key={s.id} className="flex items-center justify-between gap-3 px-5 py-3">
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-slate-800">{s.customer_name ?? "Walk-in customer"}</p>
-                    <p className="text-xs text-slate-400">
+                    <p className="truncate text-sm font-medium text-slate-800 dark:text-slate-200">{s.customer_name ?? "Walk-in customer"}</p>
+                    <p className="text-xs text-slate-400 dark:text-slate-500">
                       #{s.id} · {dateTime(s.sale_date)} ·{" "}
                       {s.items[0]?.product_name ?? ""}
                       {s.items.length > 1 && ` +${s.items.length - 1} more`}
                     </p>
                   </div>
                   <div className="shrink-0 text-right">
-                    <p className="text-sm font-bold tabular-nums text-slate-800">{naira(s.total_amount)}</p>
+                    <p className="text-sm font-bold tabular-nums text-slate-800 dark:text-slate-200">{naira(s.total_amount)}</p>
                     <p className="text-xs font-medium tabular-nums text-emerald-600">+{naira(s.total_profit)} profit</p>
                   </div>
                 </li>

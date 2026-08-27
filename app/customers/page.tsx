@@ -103,7 +103,7 @@ export default function CustomersPage() {
   }
 
   const inputCls =
-    "w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none transition-colors duration-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100";
+    "w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none transition-colors duration-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:focus:ring-indigo-800";
 
   return (
     <div>
@@ -116,7 +116,7 @@ export default function CustomersPage() {
         </button>
       </PageHeader>
 
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800 shadow-sm">
         {!customers ? (
           <TableSkeleton rows={6} cols={4} />
         ) : customers.length === 0 ? (
@@ -128,32 +128,32 @@ export default function CustomersPage() {
               const h = history[c.id];
               return (
                 <li key={c.id}>
-                  <div className="flex items-center justify-between gap-3 px-5 py-4 transition-colors duration-200 hover:bg-slate-50">
+                  <div className="flex items-center justify-between gap-3 px-5 py-4 transition-colors duration-200 hover:bg-slate-50 dark:hover:bg-slate-700">
                     <motion.button
                       onClick={() => toggleHistory(c.id)}
                       whileHover={{ scale: 1.005 }}
                       className="flex min-w-0 flex-1 items-center justify-between gap-4 text-left"
                     >
                       <div className="min-w-0">
-                        <p className="font-medium text-slate-800">{c.name}</p>
-                        <p className="truncate text-xs text-slate-400">
+                        <p className="font-medium text-slate-800 dark:text-slate-200">{c.name}</p>
+                        <p className="truncate text-xs text-slate-400 dark:text-slate-500">
                           {[c.phone, c.email].filter(Boolean).join(" · ") || "No contact details"}
                         </p>
                       </div>
-                      <span className={`shrink-0 text-xs font-semibold transition-transform duration-300 ${open ? "rotate-180 text-indigo-500" : "text-slate-400"}`}>
+                      <span className={`shrink-0 text-xs font-semibold transition-transform duration-300 ${open ? "rotate-180 text-indigo-500" : "text-slate-400 dark:text-slate-500"}`}>
                         ▼
                       </span>
                     </motion.button>
                     <div className="flex shrink-0 gap-1.5">
                       <button
                         onClick={() => openEdit(c)}
-                        className="rounded-lg bg-slate-100 px-2.5 py-1.5 text-xs font-semibold text-slate-600 transition-all duration-200 hover:scale-[1.02] hover:bg-slate-200"
+                        className="rounded-lg bg-slate-100 px-2.5 py-1.5 dark:bg-slate-700 text-xs font-semibold text-slate-600 dark:text-slate-400 transition-all duration-200 hover:scale-[1.02] hover:bg-slate-200"
                       >
                         Edit
                       </button>
                       <button
                         onClick={() => remove(c)}
-                        className="rounded-lg bg-red-50 px-2.5 py-1.5 text-xs font-semibold text-red-600 transition-all duration-200 hover:scale-[1.02] hover:bg-red-100"
+                        className="rounded-lg bg-red-50 dark:bg-red-900/30 px-2.5 py-1.5 text-xs font-semibold text-red-600 dark:text-red-400 transition-all duration-200 hover:scale-[1.02] hover:bg-red-100 dark:hover:bg-red-900/50"
                       >
                         Delete
                       </button>
@@ -166,31 +166,31 @@ export default function CustomersPage() {
                       animate={{ height: "auto", opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.25 }}
-                      className="overflow-hidden bg-slate-50/60"
+                      className="overflow-hidden bg-slate-50/60 dark:bg-slate-700/30"
                     >
                       <div className="px-5 pt-1 pb-4">
-                        {c.address && <p className="mb-3 text-xs text-slate-400">{c.address}</p>}
+                        {c.address && <p className="mb-3 text-xs text-slate-400 dark:text-slate-500">{c.address}</p>}
                         {!h || h === "loading" ? (
-                          <div className="h-16 animate-pulse rounded-lg bg-slate-100" />
+                          <div className="h-16 animate-pulse rounded-lg bg-slate-100 dark:bg-slate-700" />
                         ) : h === "error" ? (
-                          <p className="text-sm text-red-600">Couldn&apos;t load purchase history.</p>
+                          <p className="text-sm text-red-600 dark:text-red-400">Couldn&apos;t load purchase history.</p>
                         ) : h.sales.length === 0 ? (
-                          <p className="py-2 text-sm text-slate-400">No purchases yet.</p>
+                          <p className="py-2 text-sm text-slate-400 dark:text-slate-500">No purchases yet.</p>
                         ) : (
                           <>
                             <div className="mb-3 flex gap-6">
                               <div>
-                                <p className="text-[10px] font-bold tracking-wide text-slate-400 uppercase">Total spent</p>
-                                <p className="text-base font-black tabular-nums text-slate-800">{naira(h.total_spent)}</p>
+                                <p className="text-[10px] font-bold tracking-wide text-slate-400 dark:text-slate-500 uppercase">Total spent</p>
+                                <p className="text-base font-black tabular-nums text-slate-800 dark:text-slate-200">{naira(h.total_spent)}</p>
                               </div>
                               <div>
-                                <p className="text-[10px] font-bold tracking-wide text-slate-400 uppercase">Purchases</p>
-                                <p className="text-base font-black tabular-nums text-slate-800">{h.sales_count}</p>
+                                <p className="text-[10px] font-bold tracking-wide text-slate-400 dark:text-slate-500 uppercase">Purchases</p>
+                                <p className="text-base font-black tabular-nums text-slate-800 dark:text-slate-200">{h.sales_count}</p>
                               </div>
                             </div>
                             <table className="w-full text-sm">
                               <thead>
-                                <tr className="text-left text-[10px] tracking-wide text-slate-400 uppercase">
+                                <tr className="text-left text-[10px] tracking-wide text-slate-400 dark:text-slate-500 uppercase">
                                   <th className="py-1.5 pr-4 font-bold">Sale</th>
                                   <th className="py-1.5 pr-4 font-bold">Date</th>
                                   <th className="py-1.5 pr-4 text-right font-bold">Items</th>
@@ -199,11 +199,11 @@ export default function CustomersPage() {
                               </thead>
                               <tbody>
                                 {h.sales.map((s) => (
-                                  <tr key={s.sale_id} className="border-t border-slate-100">
-                                    <td className="py-2 pr-4 text-slate-500">#{s.sale_id}</td>
-                                    <td className="py-2 pr-4 text-slate-600">{dateTime(s.sale_date)}</td>
-                                    <td className="py-2 pr-4 text-right tabular-nums text-slate-600">{s.items_count}</td>
-                                    <td className="py-2 text-right font-semibold tabular-nums text-slate-800">{naira(s.total_amount)}</td>
+                                  <tr key={s.sale_id} className="border-t border-slate-100 dark:border-slate-700">
+                                    <td className="py-2 pr-4 text-slate-500 dark:text-slate-400">#{s.sale_id}</td>
+                                    <td className="py-2 pr-4 text-slate-600 dark:text-slate-400">{dateTime(s.sale_date)}</td>
+                                    <td className="py-2 pr-4 text-right tabular-nums text-slate-600 dark:text-slate-400">{s.items_count}</td>
+                                    <td className="py-2 text-right font-semibold tabular-nums text-slate-800 dark:text-slate-200">{naira(s.total_amount)}</td>
                                   </tr>
                                 ))}
                               </tbody>
@@ -222,14 +222,14 @@ export default function CustomersPage() {
 
       {totalPages > 1 && (
         <div className="mt-4 flex items-center justify-between">
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-slate-400 dark:text-slate-500">
             Showing {((page - 1) * 20) + 1}–{Math.min(page * 20, total)} of {total} customers
           </p>
           <div className="flex gap-1">
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-600 transition-colors duration-200 hover:bg-slate-100 disabled:opacity-40"
+              className="rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-400 transition-colors duration-200 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-40"
             >
               Previous
             </button>
@@ -241,7 +241,7 @@ export default function CustomersPage() {
                   key={p}
                   onClick={() => setPage(p)}
                   className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors duration-200 ${
-                    p === page ? "bg-indigo-600 text-white" : "text-slate-600 hover:bg-slate-100"
+                    p === page ? "bg-indigo-600 text-white" : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
                   }`}
                 >
                   {p}
@@ -251,7 +251,7 @@ export default function CustomersPage() {
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
-              className="rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-600 transition-colors duration-200 hover:bg-slate-100 disabled:opacity-40"
+              className="rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-400 transition-colors duration-200 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-40"
             >
               Next
             </button>
@@ -269,21 +269,21 @@ export default function CustomersPage() {
       >
         <div className="space-y-4">
           <div>
-            <label className="mb-1 block text-xs font-semibold text-slate-600">Name *</label>
+            <label className="mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-400">Name *</label>
             <input className={inputCls} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Full name" />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="mb-1 block text-xs font-semibold text-slate-600">Phone</label>
+              <label className="mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-400">Phone</label>
               <input className={inputCls} value={form.phone ?? ""} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="0803…" />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-semibold text-slate-600">Email</label>
+              <label className="mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-400">Email</label>
               <input type="email" className={inputCls} value={form.email ?? ""} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="name@mail.com" />
             </div>
           </div>
           <div>
-            <label className="mb-1 block text-xs font-semibold text-slate-600">Address</label>
+            <label className="mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-400">Address</label>
             <input className={inputCls} value={form.address ?? ""} onChange={(e) => setForm({ ...form, address: e.target.value })} placeholder="Street, city" />
           </div>
           <div className="flex justify-end gap-2 pt-2">
@@ -292,7 +292,7 @@ export default function CustomersPage() {
                 setShowForm(false);
                 setEditing(null);
               }}
-              className="rounded-lg px-4 py-2 text-sm font-semibold text-slate-500 transition-colors duration-200 hover:bg-slate-100"
+              className="rounded-lg px-4 py-2 text-sm font-semibold text-slate-500 dark:text-slate-400 transition-colors duration-200 hover:bg-slate-100 dark:hover:bg-slate-700"
             >
               Cancel
             </button>

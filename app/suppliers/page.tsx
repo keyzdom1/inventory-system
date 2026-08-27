@@ -130,7 +130,7 @@ export default function SuppliersPage() {
 
   const selectedProduct = pProduct === "" ? null : products.find((p) => p.id === pProduct);
   const inputCls =
-    "w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none transition-colors duration-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100";
+    "w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none transition-colors duration-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:focus:ring-indigo-800";
 
   return (
     <div>
@@ -151,9 +151,9 @@ export default function SuppliersPage() {
 
       <section className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {!suppliers ? (
-          Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-24 animate-pulse rounded-2xl bg-slate-200" />)
+          Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-24 animate-pulse rounded-2xl bg-slate-200 dark:bg-slate-600" />)
         ) : suppliers.length === 0 ? (
-          <div className="sm:col-span-2 lg:col-span-3 rounded-2xl border border-slate-200 bg-white">
+          <div className="sm:col-span-2 lg:col-span-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
             <EmptyState title="No suppliers yet" hint="Add your first supplier to start recording restocks." />
           </div>
         ) : (
@@ -164,30 +164,30 @@ export default function SuppliersPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: i * 0.06 }}
               whileHover={{ scale: 1.02 }}
-              className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-shadow duration-300 hover:shadow-md"
+              className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 shadow-sm transition-shadow duration-300 hover:shadow-md"
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
-                  <p className="truncate font-semibold text-slate-800">{s.name}</p>
-                  <p className="mt-0.5 truncate text-xs text-slate-400">{[s.phone, s.email].filter(Boolean).join(" · ") || "No contact details"}</p>
-                  {s.address && <p className="mt-1 truncate text-xs text-slate-400">{s.address}</p>}
+                  <p className="truncate font-semibold text-slate-800 dark:text-slate-200">{s.name}</p>
+                  <p className="mt-0.5 truncate text-xs text-slate-400 dark:text-slate-500">{[s.phone, s.email].filter(Boolean).join(" · ") || "No contact details"}</p>
+                  {s.address && <p className="mt-1 truncate text-xs text-slate-400 dark:text-slate-500">{s.address}</p>}
                 </div>
                 <div className="flex shrink-0 flex-col gap-1.5">
                   <button
                     onClick={() => openPurchase(s)}
-                    className="rounded-lg bg-emerald-50 px-2.5 py-1.5 text-xs font-semibold text-emerald-700 transition-all duration-200 hover:scale-[1.02] hover:bg-emerald-100"
+                    className="rounded-lg bg-emerald-50 dark:bg-emerald-900/30 px-2.5 py-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400 transition-all duration-200 hover:scale-[1.02] hover:bg-emerald-100 dark:hover:bg-emerald-900/50"
                   >
                     Restock
                   </button>
                   <button
                     onClick={() => openEdit(s)}
-                    className="rounded-lg bg-slate-100 px-2.5 py-1.5 text-xs font-semibold text-slate-600 transition-all duration-200 hover:scale-[1.02] hover:bg-slate-200"
+                    className="rounded-lg bg-slate-100 dark:bg-slate-700 px-2.5 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-400 transition-all duration-200 hover:scale-[1.02] hover:bg-slate-200 dark:hover:bg-slate-600"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => remove(s)}
-                    className="rounded-lg bg-red-50 px-2.5 py-1.5 text-xs font-semibold text-red-600 transition-all duration-200 hover:scale-[1.02] hover:bg-red-100"
+                    className="rounded-lg bg-red-50 dark:bg-red-900/30 px-2.5 py-1.5 text-xs font-semibold text-red-600 dark:text-red-400 transition-all duration-200 hover:scale-[1.02] hover:bg-red-100 dark:hover:bg-red-900/50"
                   >
                     Delete
                   </button>
@@ -200,14 +200,14 @@ export default function SuppliersPage() {
 
       {totalPages > 1 && (
         <div className="mb-4 flex items-center justify-between">
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-slate-400 dark:text-slate-500">
             Showing {((page - 1) * 20) + 1}–{Math.min(page * 20, total)} of {total} suppliers
           </p>
           <div className="flex gap-1">
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-600 transition-colors duration-200 hover:bg-slate-100 disabled:opacity-40"
+              className="rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-400 transition-colors duration-200 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-40"
             >
               Previous
             </button>
@@ -219,7 +219,7 @@ export default function SuppliersPage() {
                   key={p}
                   onClick={() => setPage(p)}
                   className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors duration-200 ${
-                    p === page ? "bg-indigo-600 text-white" : "text-slate-600 hover:bg-slate-100"
+                    p === page ? "bg-indigo-600 text-white" : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
                   }`}
                 >
                   {p}
@@ -229,7 +229,7 @@ export default function SuppliersPage() {
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
-              className="rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-600 transition-colors duration-200 hover:bg-slate-100 disabled:opacity-40"
+              className="rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-400 transition-colors duration-200 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-40"
             >
               Next
             </button>
@@ -237,9 +237,9 @@ export default function SuppliersPage() {
         </div>
       )}
 
-      <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <div className="border-b border-slate-100 px-5 py-4">
-          <h2 className="text-sm font-bold tracking-wide text-slate-500 uppercase">Recent Purchases</h2>
+      <section className="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm">
+        <div className="border-b border-slate-100 dark:border-slate-700 px-5 py-4">
+          <h2 className="text-sm font-bold tracking-wide text-slate-500 dark:text-slate-400 uppercase">Recent Purchases</h2>
         </div>
         {!purchases ? (
           <TableSkeleton rows={5} cols={5} />
@@ -248,7 +248,7 @@ export default function SuppliersPage() {
         ) : (
           <table className="w-full min-w-[640px] text-sm">
             <thead>
-              <tr className="border-b border-slate-100 text-left text-xs tracking-wide text-slate-400 uppercase">
+              <tr className="border-b border-slate-100 dark:border-slate-700 text-left text-xs tracking-wide text-slate-400 dark:text-slate-500 uppercase">
                 <th className="px-5 py-3 font-semibold">Product</th>
                 <th className="px-3 py-3 font-semibold">Supplier</th>
                 <th className="px-3 py-3 text-right font-semibold">Qty</th>
@@ -260,15 +260,15 @@ export default function SuppliersPage() {
               {purchases.map((p, i) => (
                 <tr
                   key={p.id}
-                  className={`border-b border-slate-50 last:border-0 ${
-                    flashPurchase && i === 0 ? "bg-emerald-50 transition-colors duration-700" : ""
+                  className={`border-b border-slate-50 dark:border-slate-700 last:border-0 ${
+                    flashPurchase && i === 0 ? "bg-emerald-50 dark:bg-emerald-900/20 transition-colors duration-700" : ""
                   }`}
                 >
-                  <td className="px-5 py-3 font-medium text-slate-800">{p.product_name}</td>
-                  <td className="px-3 py-3 text-slate-500">{p.supplier_name}</td>
-                  <td className="px-3 py-3 text-right tabular-nums text-slate-700">{p.quantity}</td>
-                  <td className="px-3 py-3 text-right tabular-nums text-slate-500">{naira(p.unit_cost)}</td>
-                  <td className="px-5 py-3 text-right text-xs whitespace-nowrap text-slate-400">{dateTime(p.purchase_date)}</td>
+                  <td className="px-5 py-3 font-medium text-slate-800 dark:text-slate-200">{p.product_name}</td>
+                  <td className="px-3 py-3 text-slate-500 dark:text-slate-400">{p.supplier_name}</td>
+                  <td className="px-3 py-3 text-right tabular-nums text-slate-700 dark:text-slate-300">{p.quantity}</td>
+                  <td className="px-3 py-3 text-right tabular-nums text-slate-500 dark:text-slate-400">{naira(p.unit_cost)}</td>
+                  <td className="px-5 py-3 text-right text-xs whitespace-nowrap text-slate-400 dark:text-slate-500">{dateTime(p.purchase_date)}</td>
                 </tr>
               ))}
             </tbody>
@@ -286,21 +286,21 @@ export default function SuppliersPage() {
       >
         <div className="space-y-4">
           <div>
-            <label className="mb-1 block text-xs font-semibold text-slate-600">Name *</label>
+            <label className="mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-400">Name *</label>
             <input className={inputCls} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Business name" />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="mb-1 block text-xs font-semibold text-slate-600">Phone</label>
+              <label className="mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-400">Phone</label>
               <input className={inputCls} value={form.phone ?? ""} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="0803…" />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-semibold text-slate-600">Email</label>
+              <label className="mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-400">Email</label>
               <input type="email" className={inputCls} value={form.email ?? ""} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="sales@supplier.com" />
             </div>
           </div>
           <div>
-            <label className="mb-1 block text-xs font-semibold text-slate-600">Address</label>
+            <label className="mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-400">Address</label>
             <input className={inputCls} value={form.address ?? ""} onChange={(e) => setForm({ ...form, address: e.target.value })} placeholder="Street, city" />
           </div>
           <div className="flex justify-end gap-2 pt-2">
@@ -309,7 +309,7 @@ export default function SuppliersPage() {
                 setShowForm(false);
                 setEditing(null);
               }}
-              className="rounded-lg px-4 py-2 text-sm font-semibold text-slate-500 transition-colors duration-200 hover:bg-slate-100"
+              className="rounded-lg px-4 py-2 text-sm font-semibold text-slate-500 dark:text-slate-400 transition-colors duration-200 hover:bg-slate-100 dark:hover:bg-slate-700"
             >
               Cancel
             </button>
@@ -327,7 +327,7 @@ export default function SuppliersPage() {
       <Modal open={showPurchase} onClose={() => setShowPurchase(false)} title="Record Purchase / Restock">
         <div className="space-y-4">
           <div>
-            <label className="mb-1 block text-xs font-semibold text-slate-600">Supplier</label>
+            <label className="mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-400">Supplier</label>
             <select className={inputCls} value={pSupplier} onChange={(e) => setPSupplier(e.target.value === "" ? "" : Number(e.target.value))}>
               <option value="">Choose supplier…</option>
               {(suppliers ?? []).map((s) => (
@@ -336,7 +336,7 @@ export default function SuppliersPage() {
             </select>
           </div>
           <div>
-            <label className="mb-1 block text-xs font-semibold text-slate-600">Product</label>
+            <label className="mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-400">Product</label>
             <select
               className={inputCls}
               value={pProduct}
@@ -353,7 +353,7 @@ export default function SuppliersPage() {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="mb-1 block text-xs font-semibold text-slate-600">Quantity received</label>
+              <label className="mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-400">Quantity received</label>
               <input
                 type="number"
                 min={1}
@@ -363,18 +363,18 @@ export default function SuppliersPage() {
               />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-semibold text-slate-600">Unit cost (₦)</label>
+              <label className="mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-400">Unit cost (₦)</label>
               <input type="number" min={0} step="0.01" className={inputCls} value={pCost} onChange={(e) => setPCost(e.target.value)} placeholder={selectedProduct ? `default ${naira(selectedProduct.cost_price)}` : "optional"} />
             </div>
           </div>
           {selectedProduct && (
-            <p className="rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-500">
+            <p className="rounded-lg bg-slate-50 dark:bg-slate-700/30 px-3 py-2 text-xs text-slate-500 dark:text-slate-400">
               Stock will go from <strong>{selectedProduct.quantity_in_stock}</strong> to{" "}
               <strong>{selectedProduct.quantity_in_stock + pQty}</strong> after saving.
             </p>
           )}
           <div className="flex justify-end gap-2 pt-2">
-            <button onClick={() => setShowPurchase(false)} className="rounded-lg px-4 py-2 text-sm font-semibold text-slate-500 transition-colors duration-200 hover:bg-slate-100">
+            <button onClick={() => setShowPurchase(false)} className="rounded-lg px-4 py-2 text-sm font-semibold text-slate-500 dark:text-slate-400 transition-colors duration-200 hover:bg-slate-100 dark:hover:bg-slate-700">
               Cancel
             </button>
             <button onClick={savePurchase} className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:scale-[1.02] hover:bg-emerald-700">
