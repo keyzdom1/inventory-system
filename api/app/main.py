@@ -11,8 +11,21 @@ from .routers import auth, admin, products, customers, suppliers, sales, purchas
 
 def init_db() -> None:
     Base.metadata.create_all(bind=engine)
-    with engine.connect() as conn:
-        conn.execute(text("SELECT 1"))
+
+    try:
+        with engine.connect() as conn:
+            result = conn.execute(text(
+                "SELECT column_name FROM information_schema.columns "
+                "WHERE table_name = 'users'"
+            ))
+            columns = {row[0] for row in result.fetchall()}
+            if "is_approved" not in columns:
+                conn.execute(text("ALTER TABLE users ADD COLUMN is_approved BOOLEAN NOT NULL DEFAULT FALSE"))
+            if "is_active" not in columns:
+                conn.execute(text("ALTER TABLE users ADD COLUMN is_active BOOLEAN NOT NULL DEFAULT TRUE"))
+            conn.commit()
+    except Exception:
+        pass
 
 
 @asynccontextmanager

@@ -22,7 +22,18 @@ export function AuthGuard({ children }: { children: ReactNode }) {
     );
   }
 
-  if (!user && pathname !== "/login") return null;
+  if (!user) return null;
+
+  if (!user.is_approved) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="max-w-sm rounded-2xl border border-amber-200 bg-amber-50 p-6 text-center shadow-sm dark:border-amber-800 dark:bg-amber-950">
+          <p className="text-sm font-semibold text-amber-700 dark:text-amber-300">Account Pending Approval</p>
+          <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">Your account is waiting for administrator approval.</p>
+        </div>
+      </div>
+    );
+  }
 
   return <>{children}</>;
 }

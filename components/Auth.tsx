@@ -40,6 +40,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  useEffect(() => {
+    if (loading) return;
+    if (!user) return;
+    api.auth
+      .me()
+      .then((fresh) => {
+        if (!fresh.is_approved || !fresh.is_active) {
+          setToken(null);
+          setStoredUser(null);
+          setUser(null);
+        } else {
+          setStoredUser(fresh);
+          setUser(fresh);
+        }
+      })
+      .catch(() => {
+        setToken(null);
+        setStoredUser(null);
+        setUser(null);
+      });
+  }, [loading, user]);
+
   const login = useCallback(async (username: string, password: string) => {
     const token = await api.auth.login(username, password);
     setToken(token.access_token);
