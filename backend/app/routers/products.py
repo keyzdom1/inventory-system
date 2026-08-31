@@ -6,13 +6,19 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from .. import models, schemas
+from ..auth import get_current_user, require_role
 from ..database import get_db
 
 router = APIRouter(prefix="/api/products", tags=["products"])
 
+_write_roles = ("admin", "manager", "inventory_clerk")
+
 
 @router.get("/low-stock", response_model=list[schemas.ProductOut])
-def low_stock(db: Session = Depends(get_db)):
+def low_stock(
+    db: Session = Depends(get_db),
+    _user: models.User = Depends(get_current_user),
+):
     return db.scalars(
         select(models.Product)
         .where(models.Product.quantity_in_stock <= models.Product.reorder_level)
@@ -26,6 +32,7 @@ def list_products(
     page: int = Query(default=1, ge=1),
     limit: int = Query(default=20, ge=1, le=100),
     db: Session = Depends(get_db),
+    _user: models.User = Depends(get_current_user),
 ):
     stmt = select(models.Product).order_by(models.Product.created_at.desc(), models.Product.id.desc())
     count_stmt = select(func.count()).select_from(models.Product)
@@ -49,7 +56,11 @@ def list_products(
 
 
 @router.get("/{product_id}", response_model=schemas.ProductOut)
-def get_product(product_id: int, db: Session = Depends(get_db)):
+def get_product(
+    product_id: int,
+    db: Session = Depends(get_db),
+    _user: models.User = Depends(get_current_user),
+):
     product = db.get(models.Product, product_id)
     if product is None:
         raise HTTPException(status_code=404, detail="Product not found")
@@ -57,7 +68,11 @@ def get_product(product_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("", response_model=schemas.ProductOut, status_code=201)
-def create_product(payload: schemas.ProductCreate, db: Session = Depends(get_db)):
+def create_product(
+    payload: schemas.ProductCreate,
+    db: Session = Depends(get_db),
+    _user: models.User = Depends(require_role(*_write_roles)),
+):
     product = models.Product(**payload.model_dump())
     db.add(product)
     db.commit()
@@ -66,7 +81,12 @@ def create_product(payload: schemas.ProductCreate, db: Session = Depends(get_db)
 
 
 @router.put("/{product_id}", response_model=schemas.ProductOut)
-def update_product(product_id: int, payload: schemas.ProductUpdate, db: Session = Depends(get_db)):
+def update_product(
+    product_id: int,
+    payload: schemas.ProductUpdate,
+    db: Session = Depends(get_db),
+    _user: models.User = Depends(require_role(*_write_roles)),
+):
     product = db.get(models.Product, product_id)
     if product is None:
         raise HTTPException(status_code=404, detail="Product not found")
@@ -78,7 +98,11 @@ def update_product(product_id: int, payload: schemas.ProductUpdate, db: Session 
 
 
 @router.delete("/{product_id}", status_code=204)
-def delete_product(product_id: int, db: Session = Depends(get_db)):
+def delete_product(
+    product_id: int,
+    db: Session = Depends(get_db),
+    _user: models.User = Depends(require_role(*_write_roles)),
+):
     product = db.get(models.Product, product_id)
     if product is None:
         raise HTTPException(status_code=404, detail="Product not found")

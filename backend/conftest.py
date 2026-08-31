@@ -64,7 +64,7 @@ def auth_headers(client):
         username="testuser",
         email="test@example.com",
         hashed_password=hash_password("password123"),
-        role="user",
+        role="manager",
         is_approved=True,
     )
     db = TestingSessionLocal()

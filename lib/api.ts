@@ -7,10 +7,12 @@ import type {
   Product,
   Purchase,
   RegisterResponse,
+  Role,
   Sale,
   Supplier,
   Token,
   User,
+  UserStats,
 } from "./types";
 
 export class ApiError extends Error {
@@ -171,6 +173,21 @@ export const api = {
     pendingUsers: () => request<User[]>("/api/admin/users/pending"),
     approveUser: (id: number) => request<User>(`/api/admin/users/${id}/approve`, { method: "POST" }),
     rejectUser: (id: number) => request<void>(`/api/admin/users/${id}/reject`, { method: "POST" }),
+    listUsers: (params?: { role?: string; status?: string; q?: string }) => {
+      const searchParams = new URLSearchParams();
+      if (params?.role) searchParams.set("role", params.role);
+      if (params?.status) searchParams.set("status", params.status);
+      if (params?.q) searchParams.set("q", params.q);
+      const qs = searchParams.toString();
+      return request<User[]>(`/api/admin/users${qs ? `?${qs}` : ""}`);
+    },
+    getUser: (id: number) => request<User>(`/api/admin/users/${id}`),
+    userStats: () => request<UserStats>("/api/admin/users/stats"),
+    updateUserRole: (id: number, role: Role) =>
+      request<User>(`/api/admin/users/${id}/role`, json("PUT", { role })),
+    updateUserStatus: (id: number, isActive: boolean) =>
+      request<User>(`/api/admin/users/${id}/status`, json("PUT", { is_active: isActive })),
+    deleteUser: (id: number) => request<void>(`/api/admin/users/${id}`, { method: "DELETE" }),
   },
   products: {
     list: (q?: string, page = 1, limit = 20) => {

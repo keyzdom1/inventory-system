@@ -1,3 +1,7 @@
+from app import models
+from conftest import TestingSessionLocal
+
+
 def test_register_success(client):
     res = client.post("/api/auth/register", json={
         "username": "newuser",
@@ -156,4 +160,186 @@ def test_admin_reject_user(client, admin_headers):
 
 def test_non_admin_cannot_access_admin_endpoints(client, auth_headers):
     res = client.get("/api/admin/users/pending", headers=auth_headers)
+    assert res.status_code == 403
+
+
+# ── New user management tests ──────────────────────────────────────────────
+
+
+def test_admin_list_all_users(client, admin_headers):
+    client.post("/api/auth/register", json={
+        "username": "user_a",
+        "email": "a@example.com",
+        "password": "password123",
+    })
+    client.post("/api/auth/register", json={
+        "username": "user_b",
+        "email": "b@example.com",
+        "password": "password123",
+    })
+    res = client.get("/api/admin/users", headers=admin_headers)
+    assert res.status_code == 200
+    users = res.json()
+    assert len(users) >= 3  # admin + 2 new users
+
+
+def test_admin_list_users_filter_by_role(client, admin_headers):
+    res = client.get("/api/admin/users?role=admin", headers=admin_headers)
+    assert res.status_code == 200
+    users = res.json()
+    assert all(u["role"] == "admin" for u in users)
+
+
+def test_admin_list_users_filter_by_status(client, admin_headers):
+    client.post("/api/auth/register", json={
+        "username": "pending_u",
+        "email": "pending_u@example.com",
+        "password": "password123",
+    })
+    res = client.get("/api/admin/users?status=pending", headers=admin_headers)
+    assert res.status_code == 200
+    users = res.json()
+    assert all(not u["is_approved"] for u in users)
+
+
+def test_admin_user_stats(client, admin_headers):
+    res = client.get("/api/admin/users/stats", headers=admin_headers)
+    assert res.status_code == 200
+    stats = res.json()
+    assert "total" in stats
+    assert "pending" in stats
+    assert "active" in stats
+    assert "roles" in stats
+
+
+def test_admin_get_single_user(client, admin_headers):
+    reg = client.post("/api/auth/register", json={
+        "username": "getme",
+        "email": "getme@example.com",
+        "password": "password123",
+    })
+    user_id = reg.json()["user"]["id"]
+    res = client.get(f"/api/admin/users/{user_id}", headers=admin_headers)
+    assert res.status_code == 200
+    assert res.json()["username"] == "getme"
+
+
+def test_admin_change_user_role(client, admin_headers):
+    reg = client.post("/api/auth/register", json={
+        "username": "promote_me",
+        "email": "promote@example.com",
+        "password": "password123",
+    })
+    user_id = reg.json()["user"]["id"]
+    # Approve first
+    client.post(f"/api/admin/users/{user_id}/approve", headers=admin_headers)
+    # Change role
+    res = client.put(f"/api/admin/users/{user_id}/role", json={"role": "manager"}, headers=admin_headers)
+    assert res.status_code == 200
+    assert res.json()["role"] == "manager"
+
+
+def test_admin_cannot_demote_another_admin(client, admin_headers):
+    # Create second admin via DB
+    from app.auth import create_access_token, hash_password
+    from app.database import Base
+    db = TestingSessionLocal()
+    other_admin = models.User(
+        username="other_admin",
+        email="other_admin@example.com",
+        hashed_password=hash_password("password123"),
+        role="admin",
+        is_approved=True,
+    )
+    db.add(other_admin)
+    db.commit()
+    db.refresh(other_admin)
+    db.close()
+
+    res = client.put(
+        f"/api/admin/users/{other_admin.id}/role",
+        json={"role": "user"},
+        headers=admin_headers,
+    )
+    assert res.status_code == 400
+
+
+def test_admin_toggle_user_status(client, admin_headers):
+    reg = client.post("/api/auth/register", json={
+        "username": "toggle_me",
+        "email": "toggle@example.com",
+        "password": "password123",
+    })
+    user_id = reg.json()["user"]["id"]
+    client.post(f"/api/admin/users/{user_id}/approve", headers=admin_headers)
+
+    # Deactivate
+    res = client.put(f"/api/admin/users/{user_id}/status", json={"is_active": False}, headers=admin_headers)
+    assert res.status_code == 200
+    assert res.json()["is_active"] is False
+
+    # Activate
+    res = client.put(f"/api/admin/users/{user_id}/status", json={"is_active": True}, headers=admin_headers)
+    assert res.status_code == 200
+    assert res.json()["is_active"] is True
+
+
+def test_admin_cannot_deactivate_self(client, admin_headers):
+    # Get admin user ID
+    me = client.get("/api/auth/me", headers=admin_headers)
+    admin_id = me.json()["id"]
+    res = client.put(f"/api/admin/users/{admin_id}/status", json={"is_active": False}, headers=admin_headers)
+    assert res.status_code == 400
+
+
+def test_admin_delete_user(client, admin_headers):
+    reg = client.post("/api/auth/register", json={
+        "username": "delete_me",
+        "email": "delete@example.com",
+        "password": "password123",
+    })
+    user_id = reg.json()["user"]["id"]
+    res = client.delete(f"/api/admin/users/{user_id}", headers=admin_headers)
+    assert res.status_code == 204
+
+
+def test_admin_cannot_delete_other_admin(client, admin_headers):
+    from app.auth import hash_password
+    db = TestingSessionLocal()
+    other_admin = models.User(
+        username="nodelete_admin",
+        email="nodelete@example.com",
+        hashed_password=hash_password("password123"),
+        role="admin",
+        is_approved=True,
+    )
+    db.add(other_admin)
+    db.commit()
+    db.refresh(other_admin)
+    db.close()
+
+    res = client.delete(f"/api/admin/users/{other_admin.id}", headers=admin_headers)
+    assert res.status_code == 400
+
+
+def test_deactivated_user_cannot_login(client, admin_headers):
+    reg = client.post("/api/auth/register", json={
+        "username": "deactivated",
+        "email": "deactivated@example.com",
+        "password": "password123",
+    })
+    user_id = reg.json()["user"]["id"]
+    client.post(f"/api/admin/users/{user_id}/approve", headers=admin_headers)
+    client.put(f"/api/admin/users/{user_id}/status", json={"is_active": False}, headers=admin_headers)
+
+    res = client.post("/api/auth/login", json={
+        "username": "deactivated",
+        "password": "password123",
+    })
+    assert res.status_code == 403
+    assert "deactivated" in res.json()["detail"].lower()
+
+
+def test_non_admin_cannot_list_all_users(client, auth_headers):
+    res = client.get("/api/admin/users", headers=auth_headers)
     assert res.status_code == 403

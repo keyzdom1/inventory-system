@@ -60,6 +60,11 @@ def login(payload: schemas.UserLogin, db: Session = Depends(get_db)):
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Account pending admin approval. Please wait for an administrator to approve your account.",
         )
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Account has been deactivated. Please contact an administrator.",
+        )
 
     token = create_access_token({"sub": str(user.id)})
     return schemas.Token(

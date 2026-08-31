@@ -3,14 +3,21 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from .. import models, schemas
+from ..auth import get_current_user, require_role
 from ..database import get_db
 from ..services.sale_service import record_purchase
 
 router = APIRouter(prefix="/api/purchases", tags=["purchases"])
 
+_write_roles = ("admin", "manager", "inventory_clerk")
+
 
 @router.post("", response_model=schemas.PurchaseOut, status_code=201)
-def create_purchase(payload: schemas.PurchaseCreate, db: Session = Depends(get_db)):
+def create_purchase(
+    payload: schemas.PurchaseCreate,
+    db: Session = Depends(get_db),
+    _user: models.User = Depends(require_role(*_write_roles)),
+):
     purchase = record_purchase(db, payload)
     return schemas.PurchaseOut(
         id=purchase.id,
@@ -25,7 +32,11 @@ def create_purchase(payload: schemas.PurchaseCreate, db: Session = Depends(get_d
 
 
 @router.get("", response_model=list[schemas.PurchaseOut])
-def list_purchases(limit: int = 50, db: Session = Depends(get_db)):
+def list_purchases(
+    limit: int = 50,
+    db: Session = Depends(get_db),
+    _user: models.User = Depends(get_current_user),
+):
     rows = db.scalars(
         select(models.Purchase).order_by(models.Purchase.purchase_date.desc()).limit(limit)
     ).all()

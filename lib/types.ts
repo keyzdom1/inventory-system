@@ -107,6 +107,16 @@ export interface User {
   email: string;
   role: string;
   is_approved: boolean;
+  is_active: boolean;
+}
+
+export type Role = "admin" | "manager" | "cashier" | "inventory_clerk" | "user";
+
+export interface UserStats {
+  total: number;
+  pending: number;
+  active: number;
+  roles: Record<string, number>;
 }
 
 export interface Token {
