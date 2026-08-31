@@ -52,6 +52,8 @@ export default function AdminPage() {
   const [roleModalUser, setRoleModalUser] = useState<User | null>(null);
   const [selectedRole, setSelectedRole] = useState<Role>("user");
   const [deleteModalUser, setDeleteModalUser] = useState<User | null>(null);
+  const [approveModalUser, setApproveModalUser] = useState<User | null>(null);
+  const [approveRole, setApproveRole] = useState<Role>("cashier");
 
   const loadData = useCallback(async () => {
     try {
@@ -81,8 +83,9 @@ export default function AdminPage() {
   async function approve(u: User) {
     setProcessing(u.id);
     try {
-      await api.admin.approveUser(u.id);
-      toast("success", `Approved "${u.username}"`);
+      await api.admin.approveUser(u.id, approveRole);
+      toast("success", `Approved "${u.username}" as ${approveRole}`);
+      setApproveModalUser(null);
       loadData();
     } catch (e) {
       toast("error", e instanceof Error ? e.message : "Approval failed");
@@ -265,7 +268,7 @@ export default function AdminPage() {
                           {!u.is_approved && (
                             <>
                               <button
-                                onClick={() => approve(u)}
+                                onClick={() => { setApproveRole("cashier"); setApproveModalUser(u); }}
                                 disabled={processing === u.id}
                                 className="rounded-lg bg-emerald-50 px-2.5 py-1.5 text-xs font-semibold text-emerald-600 transition-all duration-200 hover:bg-emerald-100 disabled:opacity-60 dark:bg-emerald-900/30 dark:text-emerald-400 dark:hover:bg-emerald-900/50"
                               >
@@ -409,6 +412,59 @@ export default function AdminPage() {
                 className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-red-700 disabled:opacity-60"
               >
                 {processing === deleteModalUser.id ? "Deleting..." : "Delete User"}
+              </button>
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      {/* Approve User Modal with Role Selection */}
+      <Modal open={!!approveModalUser} onClose={() => setApproveModalUser(null)} title="Approve User">
+        {approveModalUser && (
+          <div className="space-y-4">
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              Approve <span className="font-semibold text-slate-800 dark:text-slate-200">{approveModalUser.username}</span> and assign a role:
+            </p>
+            <div className="space-y-2">
+              {ROLES.filter((r) => r.value !== "admin").map((r) => (
+                <label
+                  key={r.value}
+                  className={`flex cursor-pointer items-center gap-3 rounded-xl border p-3 transition-all duration-200 ${
+                    approveRole === r.value
+                      ? "border-emerald-400 bg-emerald-50 dark:border-emerald-500 dark:bg-emerald-900/30"
+                      : "border-slate-200 hover:border-slate-300 dark:border-slate-600 dark:hover:border-slate-500"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="approve-role"
+                    value={r.value}
+                    checked={approveRole === r.value}
+                    onChange={() => setApproveRole(r.value)}
+                    className="h-4 w-4 text-emerald-600 focus:ring-emerald-500"
+                  />
+                  <div>
+                    <span className="text-sm font-medium text-slate-800 dark:text-slate-200">{r.label}</span>
+                    <span className={`ml-2 inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${roleBadge(r.value)}`}>
+                      {r.value}
+                    </span>
+                  </div>
+                </label>
+              ))}
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                onClick={() => setApproveModalUser(null)}
+                className="rounded-lg px-4 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-700"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => approve(approveModalUser)}
+                disabled={processing === approveModalUser.id}
+                className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 disabled:opacity-60"
+              >
+                {processing === approveModalUser.id ? "Approving..." : `Approve as ${approveRole}`}
               </button>
             </div>
           </div>

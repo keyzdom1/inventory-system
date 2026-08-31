@@ -25,6 +25,7 @@ def list_pending_users(
 @router.post("/users/{user_id}/approve", response_model=schemas.UserOut)
 def approve_user(
     user_id: int,
+    payload: schemas.ApproveUser | None = None,
     admin: models.User = Depends(require_admin),
     db: Session = Depends(get_db),
 ):
@@ -34,6 +35,8 @@ def approve_user(
     if user.is_approved:
         raise HTTPException(status_code=400, detail="User is already approved")
     user.is_approved = True
+    role = payload.role.value if payload else "cashier"
+    user.role = role
     db.commit()
     db.refresh(user)
     return user

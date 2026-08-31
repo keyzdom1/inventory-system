@@ -204,6 +204,10 @@ class UserUpdateStatus(BaseModel):
     is_active: bool
 
 
+class ApproveUser(BaseModel):
+    role: RoleEnum = RoleEnum.cashier
+
+
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"

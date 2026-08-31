@@ -171,7 +171,8 @@ export const api = {
   },
   admin: {
     pendingUsers: () => request<User[]>("/api/admin/users/pending"),
-    approveUser: (id: number) => request<User>(`/api/admin/users/${id}/approve`, { method: "POST" }),
+    approveUser: (id: number, role: Role = "cashier") =>
+      request<User>(`/api/admin/users/${id}/approve`, json("POST", { role })),
     rejectUser: (id: number) => request<void>(`/api/admin/users/${id}/reject`, { method: "POST" }),
     listUsers: (params?: { role?: string; status?: string; q?: string }) => {
       const searchParams = new URLSearchParams();

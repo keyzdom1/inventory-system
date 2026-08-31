@@ -138,6 +138,7 @@ def test_admin_approve_user(client, admin_headers):
     res = client.post(f"/api/admin/users/{user_id}/approve", headers=admin_headers)
     assert res.status_code == 200
     assert res.json()["is_approved"] is True
+    assert res.json()["role"] == "cashier"
 
     login_res = client.post("/api/auth/login", json={
         "username": "toapprove",
