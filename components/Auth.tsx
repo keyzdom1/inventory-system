@@ -9,7 +9,7 @@ interface AuthState {
   user: User | null;
   loading: boolean;
   login: (username: string, password: string) => Promise<void>;
-  register: (username: string, email: string, password: string) => Promise<void>;
+  register: (username: string, email: string, password: string, requestedRole?: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -70,9 +70,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     router.push("/");
   }, [router]);
 
-  const register = useCallback(async (username: string, email: string, password: string) => {
+  const register = useCallback(async (username: string, email: string, password: string, requestedRole?: string) => {
     const { api } = await import("@/lib/api");
-    await api.auth.register(username, email, password);
+    await api.auth.register(username, email, password, requestedRole as any);
   }, []);
 
   const logout = useCallback(() => {

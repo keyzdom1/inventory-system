@@ -14,6 +14,7 @@ export default function LoginPage() {
   const [submitting, setSubmitting] = useState(false);
   const [mode, setMode] = useState<"login" | "register">("login");
   const [email, setEmail] = useState("");
+  const [requestedRole, setRequestedRole] = useState("cashier");
   const [registered, setRegistered] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -27,7 +28,7 @@ export default function LoginPage() {
       } else {
         if (!email.trim()) return toast("error", "Email is required");
         const { api } = await import("@/lib/api");
-        const res = await api.auth.register(username, email, password);
+        const res = await api.auth.register(username, email, password, requestedRole);
         toast("success", res.message);
         setRegistered(true);
       }
@@ -101,16 +102,31 @@ export default function LoginPage() {
             </div>
 
             {mode === "register" && (
-              <div>
-                <label className="mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-400">Email</label>
-                <input
-                  type="email"
-                  className={inputCls}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                />
-              </div>
+              <>
+                <div>
+                  <label className="mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-400">Email</label>
+                  <input
+                    type="email"
+                    className={inputCls}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@example.com"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-400">Requested Role</label>
+                  <select
+                    className={inputCls}
+                    value={requestedRole}
+                    onChange={(e) => setRequestedRole(e.target.value)}
+                  >
+                    <option value="cashier">Cashier — record sales, view products, manage customers</option>
+                    <option value="manager">Manager — full access to all features</option>
+                    <option value="inventory_clerk">Inventory Clerk — manage products and suppliers</option>
+                    <option value="user">User — read-only dashboard access</option>
+                  </select>
+                </div>
+              </>
             )}
 
             <div>
