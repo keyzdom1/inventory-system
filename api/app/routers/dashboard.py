@@ -7,13 +7,17 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from .. import models, schemas
+from ..auth import get_current_user
 from ..database import get_db
 
 router = APIRouter(prefix="/api/dashboard", tags=["dashboard"])
 
 
 @router.get("/summary", response_model=schemas.DashboardSummary)
-def summary(db: Session = Depends(get_db)):
+def summary(
+    db: Session = Depends(get_db),
+    _user: models.User = Depends(get_current_user),
+):
     today = dt.date.today()
     month_start = today.replace(day=1)
 
@@ -57,7 +61,10 @@ def summary(db: Session = Depends(get_db)):
 
 
 @router.get("/monthly", response_model=list[schemas.MonthlyProductSales])
-def monthly_sales(db: Session = Depends(get_db)):
+def monthly_sales(
+    db: Session = Depends(get_db),
+    _user: models.User = Depends(get_current_user),
+):
     """Sales this month grouped by product (quantity + revenue), highest revenue first."""
     today = dt.date.today()
     month_start = today.replace(day=1)

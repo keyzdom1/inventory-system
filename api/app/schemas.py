@@ -1,8 +1,17 @@
 from datetime import datetime
 from decimal import Decimal
+from enum import Enum
 from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field
+
+
+class RoleEnum(str, Enum):
+    admin = "admin"
+    manager = "manager"
+    cashier = "cashier"
+    inventory_clerk = "inventory_clerk"
+    user = "user"
 
 
 # ---------- Products ----------
@@ -183,11 +192,26 @@ class UserOut(BaseModel):
     username: str
     email: str
     role: str
+    is_approved: bool
+    is_active: bool
+
+
+class UserUpdateRole(BaseModel):
+    role: RoleEnum
+
+
+class UserUpdateStatus(BaseModel):
+    is_active: bool
 
 
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
+    user: UserOut
+
+
+class RegisterResponse(BaseModel):
+    message: str
     user: UserOut
 
 

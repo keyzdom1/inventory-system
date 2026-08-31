@@ -5,10 +5,13 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, joinedload
 
 from .. import models, schemas
+from ..auth import get_current_user, require_role
 from ..database import get_db
 from ..services.sale_service import record_sale
 
 router = APIRouter(prefix="/api/sales", tags=["sales"])
+
+_write_roles = ("admin", "manager", "cashier")
 
 
 def sale_to_out(sale: models.Sale) -> schemas.SaleOut:
@@ -35,7 +38,11 @@ def sale_to_out(sale: models.Sale) -> schemas.SaleOut:
 
 
 @router.post("", response_model=schemas.SaleOut, status_code=201)
-def create_sale(payload: schemas.SaleCreate, db: Session = Depends(get_db)):
+def create_sale(
+    payload: schemas.SaleCreate,
+    db: Session = Depends(get_db),
+    _user: models.User = Depends(require_role(*_write_roles)),
+):
     sale = record_sale(db, payload)
     db.refresh(sale)
     return sale_to_out(sale)
@@ -46,6 +53,7 @@ def list_sales(
     day: date | None = Query(default=None, description="Filter by sale date (YYYY-MM-DD)"),
     limit: int = Query(default=50, ge=1, le=200),
     db: Session = Depends(get_db),
+    _user: models.User = Depends(get_current_user),
 ):
     stmt = (
         select(models.Sale)

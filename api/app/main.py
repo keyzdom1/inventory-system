@@ -9,7 +9,7 @@ from sqlalchemy.exc import OperationalError, ProgrammingError
 
 from . import models  # noqa: F401 — imported so Base.metadata sees every table
 from .database import Base, DATABASE_URL, engine
-from .routers import auth, customers, dashboard, products, purchases, sales, suppliers
+from .routers import auth, customers, dashboard, products, purchases, sales, suppliers, admin
 
 
 def ensure_database_exists() -> None:
@@ -80,6 +80,7 @@ app.add_middleware(
 
 for router in (
     auth.router,
+    admin.router,
     products.router,
     customers.router,
     suppliers.router,

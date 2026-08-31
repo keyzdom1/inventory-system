@@ -6,9 +6,12 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from .. import models, schemas
+from ..auth import get_current_user, require_role
 from ..database import get_db
 
 router = APIRouter(prefix="/api/suppliers", tags=["suppliers"])
+
+_write_roles = ("admin", "manager", "inventory_clerk")
 
 
 @router.get("")
@@ -16,6 +19,7 @@ def list_suppliers(
     page: int = Query(default=1, ge=1),
     limit: int = Query(default=20, ge=1, le=100),
     db: Session = Depends(get_db),
+    _user: models.User = Depends(get_current_user),
 ):
     total = db.scalar(select(func.count()).select_from(models.Supplier)) or 0
     pages = math.ceil(total / limit) if total > 0 else 1
@@ -33,7 +37,11 @@ def list_suppliers(
 
 
 @router.post("", response_model=schemas.SupplierOut, status_code=201)
-def create_supplier(payload: schemas.SupplierCreate, db: Session = Depends(get_db)):
+def create_supplier(
+    payload: schemas.SupplierCreate,
+    db: Session = Depends(get_db),
+    _user: models.User = Depends(require_role(*_write_roles)),
+):
     supplier = models.Supplier(**payload.model_dump())
     db.add(supplier)
     db.commit()
@@ -42,7 +50,12 @@ def create_supplier(payload: schemas.SupplierCreate, db: Session = Depends(get_d
 
 
 @router.put("/{supplier_id}", response_model=schemas.SupplierOut)
-def update_supplier(supplier_id: int, payload: schemas.SupplierUpdate, db: Session = Depends(get_db)):
+def update_supplier(
+    supplier_id: int,
+    payload: schemas.SupplierUpdate,
+    db: Session = Depends(get_db),
+    _user: models.User = Depends(require_role(*_write_roles)),
+):
     supplier = db.get(models.Supplier, supplier_id)
     if supplier is None:
         raise HTTPException(status_code=404, detail="Supplier not found")
@@ -54,7 +67,11 @@ def update_supplier(supplier_id: int, payload: schemas.SupplierUpdate, db: Sessi
 
 
 @router.delete("/{supplier_id}", status_code=204)
-def delete_supplier(supplier_id: int, db: Session = Depends(get_db)):
+def delete_supplier(
+    supplier_id: int,
+    db: Session = Depends(get_db),
+    _user: models.User = Depends(require_role(*_write_roles)),
+):
     supplier = db.get(models.Supplier, supplier_id)
     if supplier is None:
         raise HTTPException(status_code=404, detail="Supplier not found")
