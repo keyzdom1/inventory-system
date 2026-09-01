@@ -3,6 +3,7 @@
 import { useAuth } from "@/components/Auth";
 import { useTheme } from "@/components/ThemeProvider";
 import { useToast } from "@/components/Toast";
+import type { Role } from "@/lib/types";
 import { useState } from "react";
 
 export default function LoginPage() {
@@ -14,7 +15,7 @@ export default function LoginPage() {
   const [submitting, setSubmitting] = useState(false);
   const [mode, setMode] = useState<"login" | "register">("login");
   const [email, setEmail] = useState("");
-  const [requestedRole, setRequestedRole] = useState("cashier");
+  const [requestedRole, setRequestedRole] = useState<Role>("accountant");
   const [registered, setRegistered] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -118,12 +119,11 @@ export default function LoginPage() {
                   <select
                     className={inputCls}
                     value={requestedRole}
-                    onChange={(e) => setRequestedRole(e.target.value)}
+                    onChange={(e) => setRequestedRole(e.target.value as Role)}
                   >
-                    <option value="cashier">Cashier — record sales, view products, manage customers</option>
+                    <option value="salesperson">Salesperson — record sales, view products, manage customers</option>
                     <option value="manager">Manager — full access to all features</option>
-                    <option value="inventory_clerk">Inventory Clerk — manage products and suppliers</option>
-                    <option value="user">User — read-only dashboard access</option>
+                    <option value="accountant">Accountant — view dashboard, sales, and purchase reports</option>
                   </select>
                 </div>
               </>
