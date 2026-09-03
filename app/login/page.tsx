@@ -121,9 +121,9 @@ export default function LoginPage() {
                     value={requestedRole}
                     onChange={(e) => setRequestedRole(e.target.value as Role)}
                   >
-                    <option value="salesperson">Salesperson — record sales, view products, manage customers</option>
-                    <option value="manager">Manager — full access to all features</option>
-                    <option value="accountant">Accountant — view dashboard, sales, and purchase reports</option>
+                    <option value="salesperson">Salesperson</option>
+                    <option value="manager">Manager</option>
+                    <option value="accountant">Accountant</option>
                   </select>
                 </div>
               </>
