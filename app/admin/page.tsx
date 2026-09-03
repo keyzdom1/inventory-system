@@ -264,7 +264,7 @@ export default function AdminPage() {
                         </span>
                       </td>
                       <td className="px-5 py-4 text-slate-500 dark:text-slate-400 hidden sm:table-cell">
-                        {dateTime(u.created_at || "")}
+                        —
                       </td>
                       <td className="px-5 py-4">
                         <div className="flex items-center justify-end gap-1.5">
