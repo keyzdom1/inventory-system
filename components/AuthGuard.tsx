@@ -22,7 +22,9 @@ export function AuthGuard({ children }: { children: ReactNode }) {
     );
   }
 
-  if (!user) return null;
+  if (!user && pathname !== "/login") return null;
+
+  if (!user) return <>{children}</>;
 
   if (!user.is_approved) {
     return (
