@@ -14,7 +14,9 @@ const ROLES: { value: Role; label: string }[] = [
   { value: "admin", label: "Admin" },
   { value: "manager", label: "Manager" },
   { value: "cashier", label: "Cashier" },
+  { value: "salesperson", label: "Salesperson" },
   { value: "inventory_clerk", label: "Inventory Clerk" },
+  { value: "accountant", label: "Accountant" },
   { value: "user", label: "User" },
 ];
 
@@ -22,7 +24,9 @@ const ROLE_COLORS: Record<string, string> = {
   admin: "bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300",
   manager: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300",
   cashier: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300",
+  salesperson: "bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300",
   inventory_clerk: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
+  accountant: "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/40 dark:text-cyan-300",
   user: "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400",
 };
 

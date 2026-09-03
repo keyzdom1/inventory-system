@@ -19,7 +19,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 hours
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer(auto_error=False)
 
-VALID_ROLES = {"admin", "manager", "cashier", "inventory_clerk", "user"}
+VALID_ROLES = {"admin", "manager", "cashier", "salesperson", "inventory_clerk", "accountant", "user"}
 
 
 def hash_password(password: str) -> str:

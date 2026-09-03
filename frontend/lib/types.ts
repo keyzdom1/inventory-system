@@ -108,8 +108,15 @@ export interface User {
   role: string;
 }
 
+export type Role = "admin" | "manager" | "cashier" | "salesperson" | "inventory_clerk" | "accountant" | "user";
+
 export interface Token {
   access_token: string;
   token_type: string;
+  user: User;
+}
+
+export interface RegisterResponse {
+  message: string;
   user: User;
 }

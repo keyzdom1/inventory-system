@@ -110,7 +110,7 @@ export interface User {
   is_active: boolean;
 }
 
-export type Role = "admin" | "manager" | "cashier" | "inventory_clerk" | "user";
+export type Role = "admin" | "manager" | "cashier" | "salesperson" | "inventory_clerk" | "accountant" | "user";
 
 export interface UserStats {
   total: number;

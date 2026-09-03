@@ -6,6 +6,8 @@ import type {
   PaginatedResponse,
   Product,
   Purchase,
+  RegisterResponse,
+  Role,
   Sale,
   Supplier,
   Token,
@@ -154,8 +156,8 @@ export const api = {
   auth: {
     login: (username: string, password: string) =>
       request<Token>("/api/auth/login", json("POST", { username, password })),
-    register: (username: string, email: string, password: string) =>
-      request<Token>("/api/auth/register", json("POST", { username, email, password })),
+    register: (username: string, email: string, password: string, requestedRole?: Role) =>
+      request<RegisterResponse>("/api/auth/register", json("POST", { username, email, password, requested_role: requestedRole })),
     me: () => request<User>("/api/auth/me"),
   },
   products: {

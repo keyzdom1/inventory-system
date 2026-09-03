@@ -11,7 +11,7 @@ from ..services.sale_service import record_sale
 
 router = APIRouter(prefix="/api/sales", tags=["sales"])
 
-_write_roles = ("admin", "manager", "cashier")
+_write_roles = ("admin", "manager", "cashier", "salesperson")
 
 
 def sale_to_out(sale: models.Sale) -> schemas.SaleOut:

@@ -10,7 +10,9 @@ class RoleEnum(str, Enum):
     admin = "admin"
     manager = "manager"
     cashier = "cashier"
+    salesperson = "salesperson"
     inventory_clerk = "inventory_clerk"
+    accountant = "accountant"
     user = "user"
 
 
