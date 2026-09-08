@@ -29,11 +29,9 @@ export function Nav() {
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center gap-6 px-4 py-3">
         <Link href="/" className="flex items-center gap-2.5">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 text-sm font-black text-white shadow-md">
-            E
-          </span>
+          <img src="/keyzdom.png" alt="Keyzdommarts" className="h-8 w-8 rounded-lg shadow-md" />
           <span className="text-base font-bold tracking-tight text-slate-900">
-            ElectroMart<span className="font-medium text-slate-400"> IMS</span>
+            Keyzdommarts<span className="font-medium text-slate-400"> IMS</span>
           </span>
         </Link>
         <nav className="flex flex-1 items-center gap-1 overflow-x-auto">

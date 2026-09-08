@@ -12,7 +12,7 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "ElectroMart — Inventory & Sales",
+  title: "Keyzdommarts — Inventory & Sales",
   description: "Small business inventory, sales, and profit tracking for a Nigerian electronics store.",
 };
 

@@ -62,10 +62,8 @@ export default function LoginPage() {
               </svg>
             )}
           </button>
-          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-lg font-black text-white shadow-lg">
-            E
-          </div>
-          <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">ElectroMart IMS</h1>
+          <img src="/keyzdom.png" alt="Keyzdommarts" className="mx-auto mb-3 h-12 w-12 rounded-xl shadow-lg" />
+          <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">Keyzdommarts IMS</h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             {mode === "login" ? "Sign in to your account" : "Create a new account"}
           </p>
