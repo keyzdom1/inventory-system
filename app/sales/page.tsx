@@ -39,7 +39,7 @@ export default function SalesPage() {
       ]);
       setProducts(productRes.items);
       setCustomers(customerRes.items);
-      setRecent(salesRes.items);
+      setRecent(Array.isArray(salesRes) ? salesRes : salesRes.items);
     } catch (e) {
       toast("error", e instanceof Error ? e.message : "Failed to load data");
     }
@@ -139,27 +139,28 @@ export default function SalesPage() {
                     <span className="hidden h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-700 text-xs font-bold text-slate-500 dark:text-slate-400 sm:flex">
                       {i + 1}
                     </span>
-                    <select
-                      className={`${inputCls} flex-1`}
-                      size={products.length > 8 ? 8 : undefined}
-                      value={l.product_id}
-                      onChange={(e) => updateLine(l.key, { product_id: e.target.value === "" ? "" : Number(e.target.value) })}
-                    >
-                      <option value="">Select product…</option>
-                      {products.map((pr) => (
-                        <option key={pr.id} value={pr.id} disabled={pr.quantity_in_stock === 0}>
-                          {pr.name} — {naira(pr.selling_price)} ({pr.quantity_in_stock} in stock)
-                        </option>
-                      ))}
-                    </select>
-                    <input
-                      type="number"
-                      min={1}
-                      className={`${inputCls} w-20`}
-                      value={l.quantity === "" ? "" : l.quantity}
-                      placeholder="Qty"
-                      onChange={(e) => updateLine(l.key, { quantity: e.target.value === "" ? "" : Math.max(1, Math.floor(Number(e.target.value) || 1)) })}
-                    />
+                    <div className="flex flex-1 items-center gap-2">
+                      <select
+                        className={`${inputCls} min-w-0 flex-[3]`}
+                        value={l.product_id}
+                        onChange={(e) => updateLine(l.key, { product_id: e.target.value === "" ? "" : Number(e.target.value) })}
+                      >
+                        <option value="">Select product…</option>
+                        {products.map((pr) => (
+                          <option key={pr.id} value={pr.id} disabled={pr.quantity_in_stock === 0}>
+                            {pr.name} — {naira(pr.selling_price)} ({pr.quantity_in_stock} in stock)
+                          </option>
+                        ))}
+                      </select>
+                      <input
+                        type="number"
+                        min={1}
+                        className={`${inputCls} w-24 flex-[2]`}
+                        value={l.quantity === "" ? "" : l.quantity}
+                        placeholder="Qty"
+                        onChange={(e) => updateLine(l.key, { quantity: e.target.value === "" ? "" : Math.max(1, Math.floor(Number(e.target.value) || 1)) })}
+                      />
+                    </div>
                     <span className="w-24 shrink-0 text-right text-sm font-semibold tabular-nums text-slate-700 dark:text-slate-300">{naira(lineTotal)}</span>
                     {lines.length > 1 && (
                       <button
