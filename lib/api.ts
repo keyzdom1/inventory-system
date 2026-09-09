@@ -223,7 +223,15 @@ export const api = {
     remove: (id: number) => request<void>(`/api/suppliers/${id}`, { method: "DELETE" }),
   },
   sales: {
-    list: (limit = 10) => request<Sale[]>(`/api/sales?limit=${limit}`),
+    list: (page = 1, limit = 50, day?: string) => {
+      const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+      if (day) params.set("day", day);
+      return request<PaginatedResponse<Sale>>(`/api/sales?${params}`);
+    },
+    listByDay: (day: string) => {
+      const params = new URLSearchParams({ page: "1", limit: "200", day });
+      return request<PaginatedResponse<Sale>>(`/api/sales?${params}`);
+    },
     create: (payload: SaleInput) => request<Sale>("/api/sales", json("POST", payload)),
   },
   purchases: {

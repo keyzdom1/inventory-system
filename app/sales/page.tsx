@@ -2,8 +2,9 @@
 
 import { motion } from "motion/react";
 import { PageHeader } from "@/components/StatCard";
+import Receipt from "@/components/Receipt";
 import { useToast } from "@/components/Toast";
-import { EmptyState, TableSkeleton } from "@/components/ui";
+import { EmptyState, Modal, TableSkeleton } from "@/components/ui";
 import { ApiError, api } from "@/lib/api";
 import { dateTime, naira, toNumber } from "@/lib/format";
 import type { Customer, Product, Sale } from "@/lib/types";
@@ -12,7 +13,7 @@ import { useCallback, useEffect, useState } from "react";
 interface Line {
   key: number;
   product_id: number | "";
-  quantity: number;
+  quantity: number | "";
 }
 
 let lineKey = 1;
@@ -27,17 +28,18 @@ export default function SalesPage() {
   const [submitting, setSubmitting] = useState(false);
   const [shaking, setShaking] = useState<Set<number>>(new Set());
   const [lineErrors, setLineErrors] = useState<Record<number, string>>({});
+  const [completedSale, setCompletedSale] = useState<Sale | null>(null);
 
   const refresh = useCallback(async () => {
     try {
-      const [productRes, customerRes, sales] = await Promise.all([
+      const [productRes, customerRes, salesRes] = await Promise.all([
         api.products.list(undefined, 1, 100),
         api.customers.list(1, 100),
-        api.sales.list(10),
+        api.sales.list(1, 10),
       ]);
       setProducts(productRes.items);
       setCustomers(customerRes.items);
-      setRecent(sales);
+      setRecent(salesRes.items);
     } catch (e) {
       toast("error", e instanceof Error ? e.message : "Failed to load data");
     }
@@ -56,20 +58,22 @@ export default function SalesPage() {
   const productById = new Map(products.map((p) => [p.id, p]));
   const grandTotal = lines.reduce((sum, l) => {
     const p = l.product_id === "" ? null : productById.get(l.product_id);
-    return p ? sum + toNumber(p.selling_price) * l.quantity : sum;
+    const qty = l.quantity === "" ? 0 : l.quantity;
+    return p ? sum + toNumber(p.selling_price) * qty : sum;
   }, 0);
 
   async function submit() {
     if (lines.some((l) => l.product_id === "")) return toast("error", "Pick a product for every line");
-    if (lines.some((l) => !Number.isInteger(l.quantity) || l.quantity < 1)) return toast("error", "Quantities must be whole numbers ≥ 1");
+    if (lines.some((l) => l.quantity === "" || !Number.isInteger(l.quantity) || l.quantity < 1)) return toast("error", "Quantities must be whole numbers ≥ 1");
     setSubmitting(true);
     setLineErrors({});
     try {
       const sale = await api.sales.create({
         customer_id: customerId === "" ? null : customerId,
-        items: lines.map((l) => ({ product_id: Number(l.product_id), quantity: l.quantity })),
+        items: lines.map((l) => ({ product_id: Number(l.product_id), quantity: l.quantity as number })),
       });
       toast("success", `Sale #${sale.id} recorded — ${naira(sale.total_amount)} (${naira(sale.total_profit)} profit)`);
+      setCompletedSale(sale);
       setLines([{ key: lineKey++, product_id: "", quantity: 1 }]);
       refresh();
     } catch (e) {
@@ -115,7 +119,7 @@ export default function SalesPage() {
           <div className="space-y-3">
             {lines.map((l, i) => {
               const p = l.product_id === "" ? null : productById.get(l.product_id);
-              const lineTotal = p ? toNumber(p.selling_price) * l.quantity : 0;
+              const lineTotal = p ? toNumber(p.selling_price) * (l.quantity === "" ? 0 : l.quantity) : 0;
               const err = p ? lineErrors[p.id] : undefined;
               return (
                 <motion.div
@@ -151,8 +155,9 @@ export default function SalesPage() {
                       type="number"
                       min={1}
                       className={`${inputCls} w-20`}
-                      value={l.quantity}
-                      onChange={(e) => updateLine(l.key, { quantity: Math.max(1, Math.floor(Number(e.target.value) || 1)) })}
+                      value={l.quantity === "" ? "" : l.quantity}
+                      placeholder="Qty"
+                      onChange={(e) => updateLine(l.key, { quantity: e.target.value === "" ? "" : Math.max(1, Math.floor(Number(e.target.value) || 1)) })}
                     />
                     <span className="w-24 shrink-0 text-right text-sm font-semibold tabular-nums text-slate-700 dark:text-slate-300">{naira(lineTotal)}</span>
                     {lines.length > 1 && (
@@ -195,8 +200,11 @@ export default function SalesPage() {
         </section>
 
         <section className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm lg:col-span-2">
-          <div className="border-b border-slate-100 dark:border-slate-700 px-5 py-4">
+          <div className="border-b border-slate-100 dark:border-slate-700 px-5 py-4 flex items-center justify-between">
             <h2 className="text-sm font-bold tracking-wide text-slate-500 dark:text-slate-400 uppercase">Recent Sales</h2>
+            <a href="/sales/records" className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">
+              View all →
+            </a>
           </div>
           {!recent ? (
             <TableSkeleton rows={6} cols={2} />
@@ -224,6 +232,28 @@ export default function SalesPage() {
           )}
         </section>
       </div>
+
+      <Modal open={completedSale !== null} onClose={() => setCompletedSale(null)} title="Sale Receipt">
+        {completedSale && (
+          <div>
+            <Receipt sale={completedSale} />
+            <div className="mt-4 flex gap-3">
+              <button
+                onClick={() => window.print()}
+                className="flex-1 rounded-xl bg-indigo-600 py-2.5 text-sm font-bold text-white shadow-md transition-all duration-200 hover:bg-indigo-700"
+              >
+                Print Receipt
+              </button>
+              <button
+                onClick={() => setCompletedSale(null)}
+                className="flex-1 rounded-xl border border-slate-300 py-2.5 text-sm font-semibold text-slate-700 transition-all duration-200 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

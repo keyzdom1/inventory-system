@@ -73,7 +73,7 @@ export default function DashboardPage() {
         </div>
       ) : summary ? (
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          <StatCard label="Today's Sales" value={toNumber(summary.todays_sales)} format={(v) => naira(v)} accent="emerald" delay={0} />
+          <StatCard label="Today's Sales" value={toNumber(summary.todays_sales)} format={(v) => naira(v)} accent="emerald" delay={0} href="/sales/today" />
           <StatCard label="Products Sold Today" value={summary.products_sold_today} accent="indigo" delay={0.08} />
           <StatCard label="Low Stock" value={summary.low_stock_count} accent="amber" delay={0.16} href="/products/low-stock" pulse />
           <StatCard label="Customers" value={summary.total_customers} accent="violet" delay={0.24} />

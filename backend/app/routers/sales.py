@@ -1,7 +1,8 @@
+import math
 from datetime import date
 
 from fastapi import APIRouter, Depends, Query
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session, joinedload
 
 from .. import models, schemas
@@ -48,9 +49,10 @@ def create_sale(
     return sale_to_out(sale)
 
 
-@router.get("", response_model=list[schemas.SaleOut])
+@router.get("")
 def list_sales(
     day: date | None = Query(default=None, description="Filter by sale date (YYYY-MM-DD)"),
+    page: int = Query(default=1, ge=1),
     limit: int = Query(default=50, ge=1, le=200),
     db: Session = Depends(get_db),
     _user: models.User = Depends(get_current_user),
@@ -59,9 +61,28 @@ def list_sales(
         select(models.Sale)
         .options(joinedload(models.Sale.customer), joinedload(models.Sale.items))
         .order_by(models.Sale.sale_date.desc(), models.Sale.id.desc())
-        .limit(limit)
     )
+    count_stmt = select(func.count()).select_from(models.Sale)
+
     if day:
-        stmt = stmt.where(models.Sale.sale_date >= day).where(models.Sale.sale_date < date.fromordinal(day.toordinal() + 1))
-    sales = db.scalars(stmt).unique().all()
-    return [sale_to_out(s) for s in sales]
+        stmt = stmt.where(
+            models.Sale.sale_date >= day,
+            models.Sale.sale_date < date.fromordinal(day.toordinal() + 1),
+        )
+        count_stmt = count_stmt.where(
+            models.Sale.sale_date >= day,
+            models.Sale.sale_date < date.fromordinal(day.toordinal() + 1),
+        )
+
+    total = db.scalar(count_stmt) or 0
+    pages = math.ceil(total / limit) if total > 0 else 1
+    offset = (page - 1) * limit
+    sales = db.scalars(stmt.offset(offset).limit(limit)).unique().all()
+
+    return {
+        "items": [sale_to_out(s) for s in sales],
+        "total": total,
+        "page": page,
+        "limit": limit,
+        "pages": pages,
+    }
