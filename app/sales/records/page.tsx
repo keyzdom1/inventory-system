@@ -1,7 +1,7 @@
 "use client";
 
 import { PageHeader } from "@/components/StatCard";
-import { EmptyState, TableSkeleton } from "@/components/ui";
+import { EmptyState, Modal, TableSkeleton } from "@/components/ui";
 import { api } from "@/lib/api";
 import { dateTime, naira } from "@/lib/format";
 import type { PaginatedResponse, Sale } from "@/lib/types";
@@ -15,6 +15,7 @@ export default function SalesRecordsPage() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedSale, setSelectedSale] = useState<Sale | null>(null);
 
   const limit = 20;
 
@@ -86,7 +87,11 @@ export default function SalesRecordsPage() {
                 </thead>
                 <tbody>
                   {sales!.map((s, i) => (
-                    <tr key={s.id} className={`border-b border-slate-50 last:border-0 ${i % 2 === 0 ? "" : "bg-slate-50/60 dark:bg-slate-700/30"} dark:border-slate-700`}>
+                    <tr
+                      key={s.id}
+                      onClick={() => setSelectedSale(s)}
+                      className={`cursor-pointer border-b border-slate-50 last:border-0 transition-colors hover:bg-indigo-50/50 dark:hover:bg-indigo-900/20 ${i % 2 === 0 ? "" : "bg-slate-50/60 dark:bg-slate-700/30"} dark:border-slate-700`}
+                    >
                       <td className="px-5 py-3 font-medium text-slate-800 dark:text-slate-200">#{s.id}</td>
                       <td className="px-5 py-3 tabular-nums text-slate-600 dark:text-slate-400">{dateTime(s.sale_date)}</td>
                       <td className="px-5 py-3 text-slate-700 dark:text-slate-300">{s.customer_name ?? "Walk-in customer"}</td>
@@ -153,6 +158,55 @@ export default function SalesRecordsPage() {
           )}
         </>
       )}
+
+      <Modal open={selectedSale !== null} onClose={() => setSelectedSale(null)} title={`Sale #${selectedSale?.id ?? ""}`} wide>
+        {selectedSale && (
+          <div>
+            <div className="mb-4 flex items-center justify-between text-sm">
+              <div>
+                <p className="text-slate-500 dark:text-slate-400">Customer</p>
+                <p className="font-semibold text-slate-800 dark:text-slate-200">{selectedSale.customer_name ?? "Walk-in customer"}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-slate-500 dark:text-slate-400">Date & Time</p>
+                <p className="font-semibold text-slate-800 dark:text-slate-200">{dateTime(selectedSale.sale_date)}</p>
+              </div>
+            </div>
+
+            <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-slate-200 bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500 dark:border-slate-700 dark:bg-slate-700/50 dark:text-slate-400">
+                    <th className="px-4 py-2.5 font-semibold">Product</th>
+                    <th className="px-4 py-2.5 text-center font-semibold">Qty</th>
+                    <th className="px-4 py-2.5 text-right font-semibold">Unit Price</th>
+                    <th className="px-4 py-2.5 text-right font-semibold">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {selectedSale.items.map((item) => (
+                    <tr key={item.id} className="border-b border-slate-100 last:border-0 dark:border-slate-700">
+                      <td className="px-4 py-2.5 font-medium text-slate-800 dark:text-slate-200">{item.product_name}</td>
+                      <td className="px-4 py-2.5 text-center tabular-nums">{item.quantity}</td>
+                      <td className="px-4 py-2.5 text-right tabular-nums text-slate-600 dark:text-slate-400">{naira(item.unit_price)}</td>
+                      <td className="px-4 py-2.5 text-right font-semibold tabular-nums">{naira(item.line_total)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="mt-4 flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 dark:bg-slate-700/50">
+              <span className="text-sm font-semibold text-slate-500 dark:text-slate-400">Total</span>
+              <span className="text-lg font-black tabular-nums text-slate-900 dark:text-slate-100">{naira(selectedSale.total_amount)}</span>
+            </div>
+            <div className="mt-1 flex items-center justify-between px-4 py-1">
+              <span className="text-xs text-slate-500 dark:text-slate-400">Profit</span>
+              <span className="text-sm font-bold tabular-nums text-emerald-600">{naira(selectedSale.total_profit)}</span>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }
