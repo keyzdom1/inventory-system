@@ -1,6 +1,7 @@
 "use client";
 
 import { PageHeader } from "@/components/StatCard";
+import Receipt from "@/components/Receipt";
 import { EmptyState, Modal, TableSkeleton } from "@/components/ui";
 import { api } from "@/lib/api";
 import { dateTime, naira } from "@/lib/format";
@@ -203,6 +204,25 @@ export default function SalesRecordsPage() {
             <div className="mt-1 flex items-center justify-between px-4 py-1">
               <span className="text-xs text-slate-500 dark:text-slate-400">Profit</span>
               <span className="text-sm font-bold tabular-nums text-emerald-600">{naira(selectedSale.total_profit)}</span>
+            </div>
+
+            <div className="mt-4 flex gap-3">
+              <button
+                onClick={() => window.print()}
+                className="flex-1 rounded-xl bg-indigo-600 py-2.5 text-sm font-bold text-white shadow-md transition-all duration-200 hover:bg-indigo-700"
+              >
+                Print Receipt
+              </button>
+              <button
+                onClick={() => setSelectedSale(null)}
+                className="flex-1 rounded-xl border border-slate-300 py-2.5 text-sm font-semibold text-slate-700 transition-all duration-200 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
+              >
+                Close
+              </button>
+            </div>
+
+            <div className="hidden print:block">
+              <Receipt sale={selectedSale} />
             </div>
           </div>
         )}
