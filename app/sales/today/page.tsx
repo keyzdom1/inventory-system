@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/StatCard";
 import { EmptyState, TableSkeleton } from "@/components/ui";
 import { api } from "@/lib/api";
 import { dateTime, naira } from "@/lib/format";
-import type { Sale } from "@/lib/types";
+import type { PaginatedResponse, Sale } from "@/lib/types";
 import { useEffect, useState } from "react";
 
 function toDateString(d: Date): string {
@@ -16,6 +16,11 @@ function toDateString(d: Date): string {
 
 function formatDisplayDate(d: Date): string {
   return d.toLocaleDateString("en-NG", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+}
+
+function extractSales(data: PaginatedResponse<Sale> | Sale[]): Sale[] {
+  if (Array.isArray(data)) return data;
+  return data.items ?? [];
 }
 
 export default function TodaySalesPage() {
@@ -30,7 +35,7 @@ export default function TodaySalesPage() {
     async function load() {
       try {
         const res = await api.sales.listByDay(todayStr);
-        if (!cancelled) setSales(res.items);
+        if (!cancelled) setSales(extractSales(res));
       } catch (e) {
         if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load sales");
       }

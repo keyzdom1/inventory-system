@@ -141,6 +141,7 @@ export default function SalesPage() {
                     </span>
                     <select
                       className={`${inputCls} flex-1`}
+                      size={products.length > 8 ? 8 : undefined}
                       value={l.product_id}
                       onChange={(e) => updateLine(l.key, { product_id: e.target.value === "" ? "" : Number(e.target.value) })}
                     >
@@ -170,6 +171,15 @@ export default function SalesPage() {
                       </button>
                     )}
                   </div>
+                  {p && (
+                    <div className="mt-2 flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-1.5 text-xs dark:bg-slate-700/50">
+                      <span className="font-semibold text-slate-700 dark:text-slate-300">{p.name}</span>
+                      <span className="text-slate-400">x</span>
+                      <span className="font-bold text-indigo-600 dark:text-indigo-400">{l.quantity === "" ? 0 : l.quantity}</span>
+                      <span className="ml-auto text-slate-400">=</span>
+                      <span className="ml-auto font-semibold text-slate-700 dark:text-slate-300">{naira(lineTotal)}</span>
+                    </div>
+                  )}
                   {err && <p className="mt-2 pl-1 text-xs font-semibold text-red-600 dark:text-red-400">{err}</p>}
                 </motion.div>
               );

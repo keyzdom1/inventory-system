@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/StatCard";
 import { EmptyState, TableSkeleton } from "@/components/ui";
 import { api } from "@/lib/api";
 import { dateTime, naira } from "@/lib/format";
-import type { Sale } from "@/lib/types";
+import type { PaginatedResponse, Sale } from "@/lib/types";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -25,9 +25,15 @@ export default function SalesRecordsPage() {
       try {
         const res = await api.sales.list(page, limit);
         if (!cancelled) {
-          setSales(res.items);
-          setTotalPages(res.pages);
-          setTotal(res.total);
+          if (Array.isArray(res)) {
+            setSales(res);
+            setTotalPages(1);
+            setTotal(res.length);
+          } else {
+            setSales(res.items);
+            setTotalPages(res.pages);
+            setTotal(res.total);
+          }
         }
       } catch (e) {
         if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load sales");
